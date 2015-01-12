@@ -177,12 +177,12 @@ module.exports = {
           }
         }
       }
-    }
-  },
-  output: {
-    out: {
-      title: "out",
-      type: "string"
+    },
+    output: {
+      out: {
+        title: "out",
+        type: "string"
+      }
     }
   },
   state: {}
