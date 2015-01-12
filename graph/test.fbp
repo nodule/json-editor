@@ -3,8 +3,11 @@ ns: json-editor
 name: editor
 
 JSONEditor(json-editor/editor)
+BodyEl(dom/querySelector)
 Log(console/log)
 
+# sending as IIP seems to be broken :/
+'body' -> @selector BodyEl selection -> ^element JSONEditor
 {
   "type": "object",
   "properties": {
@@ -19,4 +22,9 @@ Log(console/log)
   "title": "Hey!"
 } -> in JSONEditor
 
+# trying to get it started
+{} -> @options JSONEditor
+
 JSONEditor out -> msg Log
+BodyEl error -> msg Log
+BodyEl selection -> msg Log
