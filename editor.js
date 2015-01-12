@@ -22,6 +22,7 @@ module.exports = {
         title: "Json",
         description: "JSON Object",
         type: "object",
+        async: true,
         "default": {},
         fn: function __IN__(data, x, source, state, input, output) {
           var r = function() {
@@ -39,6 +40,7 @@ module.exports = {
       schema: {
         title: "Schema",
         type: "object",
+        async: true,
         description: "A valid JSON Schema to use for the editor. Version 3 and Version 4 of the draft specification are supported.",
         fn: function __SCHEMA__(data, x, source, state, input, output) {
           var r = function() {
@@ -66,6 +68,7 @@ module.exports = {
       enable: {
         title: "Enable",
         description: "Enable",
+        async: true,
         fn: function __ENABLE__(data, x, source, state, input, output) {
           var r = function() {
             if (state.jsonEditor) {
@@ -81,6 +84,7 @@ module.exports = {
       disable: {
         title: "Disable",
         description: "Disable",
+        async: true,
         fn: function __DISABLE__(data, x, source, state, input, output) {
           var r = function() {
             if (state.jsonEditor) {

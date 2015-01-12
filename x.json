@@ -22,20 +22,24 @@
             "title": "Json",
             "type": "object",
             "description": "JSON Object",
-            "default": {}
+            "default": {},
+            "async": true
           },
           "schema": {
             "title": "Schema",
             "type": "object",
-            "description": "A valid JSON Schema to use for the editor. Version 3 and Version 4 of the draft specification are supported."
+            "description": "A valid JSON Schema to use for the editor. Version 3 and Version 4 of the draft specification are supported.",
+            "async": true
           },
           "enable": {
             "title": "Enable",
-            "description": "Enable"
+            "description": "Enable",
+            "async": true
           },
           "disable": {
             "title": "Disable",
-            "description": "Disable"
+            "description": "Disable",
+            "async": true
           },
           "options": {
             "title": "Options",
