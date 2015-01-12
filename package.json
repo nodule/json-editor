@@ -1,0 +1,27 @@
+{
+  "name": "chix-json-editor",
+  "description": "JSON Editor for Chiχ",
+  "author": "Rob Halff <rob.halff@gmail.com>",
+  "version": "0.0.2",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodule/data.git"
+  },
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "scripts": {
+    "test": "chit -r"
+  },
+  "dependencies": {
+    "json-editor": "^0.7.13"
+  },
+  "devDependencies": {
+    "chit": "0.x.x"
+  },
+  "chix": {
+    "name": "json-editor",
+    "color": "rgb(136,0,35)"
+  }
+}
