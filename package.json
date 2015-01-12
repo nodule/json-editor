@@ -18,7 +18,8 @@
     "json-editor": "^0.7.13"
   },
   "devDependencies": {
-    "chit": "0.x.x"
+    "chit": "0.x.x",
+    "chix-flow": "^0.11.3"
   },
   "chix": {
     "name": "json-editor",

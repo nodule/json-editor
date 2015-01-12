@@ -21,6 +21,7 @@ module.exports = {
       "in": {
         title: "Json",
         description: "JSON Object",
+        type: "object",
         "default": {},
         fn: function __IN__(data, x, source, state, input, output) {
           var r = function() {
@@ -37,6 +38,7 @@ module.exports = {
       },
       schema: {
         title: "Schema",
+        type: "object",
         description: "A valid JSON Schema to use for the editor. Version 3 and Version 4 of the draft specification are supported.",
         fn: function __SCHEMA__(data, x, source, state, input, output) {
           var r = function() {

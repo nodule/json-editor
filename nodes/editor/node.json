@@ -20,11 +20,13 @@
       },
       "in": {
         "title": "Json",
+        "type": "object",
         "description": "JSON Object",
         "default": {}
       },
       "schema": {
         "title": "Schema",
+        "type": "object",
         "description": "A valid JSON Schema to use for the editor. Version 3 and Version 4 of the draft specification are supported."
       },
       "enable": {

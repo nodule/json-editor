@@ -1,0 +1,22 @@
+title: Test JSON Editor
+ns: json-editor
+name: editor
+
+JSONEditor(json-editor/editor)
+Log(console/log)
+
+{
+  "type": "object",
+  "properties": {
+    "title": {
+      "title": "Title",
+      "type": "string"
+    }
+  }
+} -> schema JSONEditor
+
+{
+  "title": "Hey!"
+} -> in JSONEditor
+
+JSONEditor out -> msg Log
