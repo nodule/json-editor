@@ -23,6 +23,7 @@ Log(console/log)
 } -> in JSONEditor
 
 # trying to get it started
+# is async broke and always returning false maybe?
 {} -> @options JSONEditor
 
 JSONEditor out -> msg Log

@@ -3,6 +3,7 @@ module.exports = {
   ns: "json-editor",
   title: "JSON Editor",
   description: "JSON Editor",
+  async: true,
   phrases: {
     active: "Creating JSON Editor"
   },

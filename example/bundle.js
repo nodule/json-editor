@@ -2093,7 +2093,7 @@ Actor.prototype.__input = function(link, p) {
 
   var self = this;
 
-//  this.ioHandler.lock(link);
+  this.ioHandler.lock(link);
 
   var targetNode = this.getNode(link.target.id);
 
@@ -7077,8 +7077,8 @@ xNode.prototype._allConnectedSyncFilled = function() {
     var port = this.openPorts[i];
 
     // .async test can be removed, .fn is enough
-    if (!this.ports.input[port].async ||
-      !this.ports.input[port].fn) {
+    if (!this.ports.input[port].async) {
+      // || !this.ports.input[port].fn) {
 
       if (this.ports.input[port].indexed) {
         if (/object/i.test(this.ports.input[port].type)) {
@@ -14474,7 +14474,229 @@ module.exports={
   }
 }
 
-},{}],"json-editor":[function(require,module,exports){
+},{}],54:[function(require,module,exports){
+'use strict';
+
+/**
+ *
+ * Ok, this should be a general listener interface.
+ *
+ * One who will use it is the Actor.
+ * But I want to be able to do the same for e.g. Loader.
+ *
+ * They will all be in chix-monitor-*
+ *
+ * npmlog =  Listener(instance, options);
+ *
+ * The return is just in case you want to do other stuff.
+ *
+ * e.g. fbpx wants to add this to npmlog:
+ *
+ * Logger.level = program.verbose ? 'verbose' : program.debug;
+ *
+ */
+// function NpmLogActorMonitor(actor, opts) {
+module.exports = function NpmLogActorMonitor(Logger, actor) {
+
+   // TODO: just make an NpmLogIOMonitor.
+   var ioHandler = actor.ioHandler;
+
+   actor.on('removeLink', function(event) {
+     Logger.debug(
+       event.node ? event.node.identifier : 'Some Actor',
+       'removed link'
+     );
+   });
+
+   // Ok emiting each and every output I don't like for the IOHandler.
+   // but whatever can change it later.
+   ioHandler.on('output', function(data) {
+
+     // I don't like this data.out.port thing vs data.port
+     switch(data.port) {
+
+        case ':plug':
+         Logger.debug(
+           data.node.identifier,
+           'port %s plugged (%d)',
+           data.out.read().port,
+           data.out.read().connections);
+        break;
+
+        case ':unplug':
+         Logger.debug(
+           data.node.identifier,
+           'port %s unplugged (%d)',
+           data.out.read().port,
+           data.out.read().connections);
+        break;
+
+        case ':portFill':
+         Logger.info(
+           data.node.identifier,
+           'port %s filled with data',
+           data.out.read().port);
+        break;
+
+        case ':contextUpdate':
+         Logger.info(
+           data.node.identifier,
+           'port %s filled with context',
+           data.out.read().port);
+        break;
+
+        case ':inputValidated':
+          Logger.debug(data.node.identifier, 'input validated');
+        break;
+
+        case ':start':
+          Logger.info(data.node.identifier, 'START');
+        break;
+
+        case ':freePort':
+          Logger.debug(data.node.identifier, 'free port %s', data.out.read().port);
+        break;
+
+/*
+       case ':queue':
+         Logger.debug(
+           data.node,
+           'queue: %s',
+           data.port
+         );
+       break;
+*/
+
+       case ':openPort':
+         Logger.info(
+           data.node.identifier,
+           'opened port %s (%d)',
+           data.out.read().port,
+           data.out.read().connections
+           );
+       break;
+
+       case ':closePort':
+         Logger.info(
+           data.node.identifier,
+           'closed port %s',
+           data.out.read().port
+           );
+       break;
+
+       case ':index':
+         Logger.info(
+           data.node.identifier,
+           '[%s] set on port `%s`',
+           data.out.read().index,
+           data.out.read().port
+           );
+       break;
+
+       case ':nodeComplete':
+         // console.log('nodeComplete', data);
+         Logger.info(data.node.identifier, 'completed');
+       break;
+
+       case ':portReject':
+         Logger.debug(
+           data.node.identifier,
+           'rejected input on port %s',
+           data.out.read().port
+         );
+       break;
+
+       case ':inputRequired':
+         Logger.error(
+           data.node.identifier,
+           'input required on port %s',
+           data.out.read().port);
+       break;
+
+       case ':error':
+         Logger.error(
+           data.node.identifier,
+           data.out.read().msg
+         );
+       break;
+
+       case ':nodeTimeout':
+         Logger.error(
+           data.node.identifier,
+           'node timeout'
+         );
+       break;
+
+       case ':executed':
+         Logger.info(
+           data.node.identifier,
+           'EXECUTED'
+         );
+       break;
+
+       case ':inputTimeout':
+         Logger.info(
+           data.node.identifier,
+           'input timeout, got %s need %s',
+           Object.keys(data.node.input).join(', '),
+           data.node.openPorts.join(', '));
+       break;
+
+       default:
+         // TODO: if the above misses a system port it will be reported
+         //       as default normal output.
+         Logger.info(data.node.identifier, 'output on port %s', data.port);
+       break;
+
+     }
+
+   });
+
+   return Logger;
+
+};
+
+},{}],55:[function(require,module,exports){
+'use strict';
+
+/**
+ *
+ * NpmLog monitor for the Loader
+ *
+ */
+module.exports = function NpmLogLoaderMonitor(Logger, loader) {
+
+  loader.on('loadUrl', function(data) {
+    Logger.info( 'loadUrl', data.url);
+  });
+
+  loader.on('loadFile', function(data) {
+    Logger.info( 'loadFile', data.path);
+  });
+
+  loader.on('loadCache', function(data) {
+    Logger.debug( 'cache', 'loaded cache file %s', data.file);
+  });
+
+  loader.on('purgeCache', function(data) {
+    Logger.debug( 'cache', 'purged cache file %s', data.file);
+  });
+
+  loader.on('writeCache', function(data) {
+    Logger.debug( 'cache', 'wrote cache file %s', data.file);
+  });
+
+  return Logger;
+
+};
+
+},{}],"chix-monitor-npmlog":[function(require,module,exports){
+module.exports=require('HNG52E');
+},{}],"HNG52E":[function(require,module,exports){
+exports.Actor = require('./lib/actor');
+exports.Loader = require('./lib/loader');
+
+},{"./lib/actor":54,"./lib/loader":55}],"json-editor":[function(require,module,exports){
 module.exports=require('pRDjjY');
 },{}],"pRDjjY":[function(require,module,exports){
 /*! JSON Editor v0.7.13 - JSON Schema -> HTML Editor
@@ -21542,16 +21764,18 @@ Loader.prototype.getNodeDefinition = function(node, map) {
 var Flow = require('chix-flow').Flow;
 var loader = new Loader();
 
-var map = {"id":"fcd242ea-a912-42b6-9401-537e8d2cb437","type":"flow","links":[{"source":{"id":"BodyEl","port":"selection"},"target":{"id":"JSONEditor","port":"element","setting":{"persist":true}},"metadata":{"title":"BodyEl selection -> element JSONEditor"}},{"source":{"id":"JSONEditor","port":"out"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"JSONEditor out -> msg Log"}},{"source":{"id":"BodyEl","port":"error"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"BodyEl error -> msg Log"}},{"source":{"id":"BodyEl","port":"selection"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"BodyEl selection -> msg Log"}}],"nodes":[{"id":"JSONEditor","title":"JSONEditor","ns":"json-editor","name":"editor","context":{"options":{}}},{"id":"BodyEl","title":"BodyEl","ns":"dom","name":"querySelector","context":{"selector":"body"}},{"id":"Log","title":"Log","ns":"console","name":"log"}],"title":"Test JSON Editor","ns":"json-editor","name":"editor","providers":{"@":{"url":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}}};
+var map = {"id":"9a67ae26-8323-462f-856a-c1325df05bd5","type":"flow","links":[{"source":{"id":"BodyEl","port":"selection"},"target":{"id":"JSONEditor","port":"element","setting":{"persist":true}},"metadata":{"title":"BodyEl selection -> element JSONEditor"}},{"source":{"id":"JSONEditor","port":"out"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"JSONEditor out -> msg Log"}},{"source":{"id":"BodyEl","port":"error"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"BodyEl error -> msg Log"}},{"source":{"id":"BodyEl","port":"selection"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"BodyEl selection -> msg Log"}}],"nodes":[{"id":"JSONEditor","title":"JSONEditor","ns":"json-editor","name":"editor","context":{"options":{}}},{"id":"BodyEl","title":"BodyEl","ns":"dom","name":"querySelector","context":{"selector":"body"}},{"id":"Log","title":"Log","ns":"console","name":"log"}],"title":"Test JSON Editor","ns":"json-editor","name":"editor","providers":{"@":{"url":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}}};
 
 var actor;
 window.Actor = actor = Flow.create(map, loader);
 
+var monitor = require('chix-monitor-npmlog').Actor;
+monitor(console, actor);
 
 function onDeviceReady() {
 actor.run();
 actor.push();
-actor.sendIIPs([{"source":{"id":"fcd242ea-a912-42b6-9401-537e8d2cb437","port":":iip"},"target":{"id":"JSONEditor","port":"schema"},"metadata":{"title":"Test JSON Editor :iip -> schema JSONEditor"},"data":{"type":"object","properties":{"title":{"title":"Title","type":"string"}}}},{"source":{"id":"fcd242ea-a912-42b6-9401-537e8d2cb437","port":":iip"},"target":{"id":"JSONEditor","port":"in"},"metadata":{"title":"Test JSON Editor :iip -> in JSONEditor"},"data":{"title":"Hey!"}}]);
+actor.sendIIPs([{"source":{"id":"9a67ae26-8323-462f-856a-c1325df05bd5","port":":iip"},"target":{"id":"JSONEditor","port":"schema"},"metadata":{"title":"Test JSON Editor :iip -> schema JSONEditor"},"data":{"type":"object","properties":{"title":{"title":"Title","type":"string"}}}},{"source":{"id":"9a67ae26-8323-462f-856a-c1325df05bd5","port":":iip"},"target":{"id":"JSONEditor","port":"in"},"metadata":{"title":"Test JSON Editor :iip -> in JSONEditor"},"data":{"title":"Hey!"}}]);
 
 };
 
@@ -21565,4 +21789,4 @@ if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry|IEMobile)/))
 // as long as this module is loaded.
 module.exports = actor;
 
-},{"chix-flow":"jXAsbI"}]},{},["Wu6dvS"])
+},{"chix-flow":"jXAsbI","chix-monitor-npmlog":"HNG52E"}]},{},["Wu6dvS"])

@@ -19,7 +19,8 @@
   },
   "devDependencies": {
     "chit": "0.x.x",
-    "chix-flow": "^0.11.3"
+    "chix-flow": "^0.11.3",
+    "chix-monitor-npmlog": "0.0.5"
   },
   "chix": {
     "name": "json-editor",

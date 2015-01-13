@@ -143,6 +143,7 @@
       "phrases": {
         "active": "Creating JSON Editor"
       },
+      "async": true,
       "description": "JSON Editor",
       "title": "JSON Editor",
       "ns": "json-editor",
