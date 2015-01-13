@@ -148,7 +148,7 @@
       "title": "JSON Editor",
       "ns": "json-editor",
       "name": "editor",
-      "fn": "on.input.in = function() {\n  state.in = data;\n  if (state.jsonEditor) {\n    state.jsonEditor.setValue(state.in);\n  }\n};\n\non.input.schema = function() {\n  state.schema = input.options.schema = input.schema;\n  if (state.jsonEditor) {\n    state.jsonEditor.destroy();\n  }\n  state.jsonEditor = json_editor(input.element, input.options);\n  // problem if state.in is not about this schema..\n  if (state.in) {\n    state.jsonEditor.setValue(state.in);\n  }\n  state.jsonEditor.on('change', function() {\n    output({out: state.jsonEditor.getValue()});\n  });\n};\n\non.input.enable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.enable();\n  }\n};\n\non.input.disable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.disable();\n  }\n};\n"
+      "fn": "on.input.in = function() {\n  state.in = data;\n  if (state.jsonEditor) {\n    state.jsonEditor.setValue(state.in);\n  }\n};\n\non.input.schema = function() {\n  state.schema = input.options.schema = input.schema;\n  if (state.jsonEditor) {\n    state.jsonEditor.destroy();\n  }\n  state.jsonEditor = new json_editor(input.element, input.options);\n  // problem if state.in is not about this schema..\n  if (state.in) {\n    state.jsonEditor.setValue(state.in);\n  }\n  state.jsonEditor.on('change', function() {\n    output({out: state.jsonEditor.getValue()});\n  });\n};\n\non.input.enable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.enable();\n  }\n};\n\non.input.disable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.disable();\n  }\n};\n"
     }
   ],
   "twigs": []

@@ -49,7 +49,7 @@ module.exports = {
             if (state.jsonEditor) {
               state.jsonEditor.destroy();
             }
-            state.jsonEditor = json_editor(input.options);
+            state.jsonEditor = new json_editor(input.options);
             // problem if state.in is not about this schema..
             if (state.in) {
               state.jsonEditor.setValue(state.in);
