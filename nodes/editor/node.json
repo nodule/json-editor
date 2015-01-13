@@ -23,7 +23,6 @@
         "title": "Json",
         "type": "object",
         "description": "JSON Object",
-        "default": {},
         "async": true
       },
       "schema": {

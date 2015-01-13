@@ -24,7 +24,6 @@ module.exports = {
         description: "JSON Object",
         type: "object",
         async: true,
-        "default": {},
         fn: function __IN__(data, x, source, state, input, output) {
           var r = function() {
             state.in = data;
