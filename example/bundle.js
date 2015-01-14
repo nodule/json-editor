@@ -24886,13 +24886,1432 @@ JSONEditor.defaults.resolvers.unshift(function(schema) {
   module.exports = JSONEditor;
 })();
 
+},{}],"underscore":[function(require,module,exports){
+module.exports=require('ZKusGn');
+},{}],"ZKusGn":[function(require,module,exports){
+//     Underscore.js 1.7.0
+//     http://underscorejs.org
+//     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     Underscore may be freely distributed under the MIT license.
+
+(function() {
+
+  // Baseline setup
+  // --------------
+
+  // Establish the root object, `window` in the browser, or `exports` on the server.
+  var root = this;
+
+  // Save the previous value of the `_` variable.
+  var previousUnderscore = root._;
+
+  // Save bytes in the minified (but not gzipped) version:
+  var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
+
+  // Create quick reference variables for speed access to core prototypes.
+  var
+    push             = ArrayProto.push,
+    slice            = ArrayProto.slice,
+    concat           = ArrayProto.concat,
+    toString         = ObjProto.toString,
+    hasOwnProperty   = ObjProto.hasOwnProperty;
+
+  // All **ECMAScript 5** native function implementations that we hope to use
+  // are declared here.
+  var
+    nativeIsArray      = Array.isArray,
+    nativeKeys         = Object.keys,
+    nativeBind         = FuncProto.bind;
+
+  // Create a safe reference to the Underscore object for use below.
+  var _ = function(obj) {
+    if (obj instanceof _) return obj;
+    if (!(this instanceof _)) return new _(obj);
+    this._wrapped = obj;
+  };
+
+  // Export the Underscore object for **Node.js**, with
+  // backwards-compatibility for the old `require()` API. If we're in
+  // the browser, add `_` as a global object.
+  if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports) {
+      exports = module.exports = _;
+    }
+    exports._ = _;
+  } else {
+    root._ = _;
+  }
+
+  // Current version.
+  _.VERSION = '1.7.0';
+
+  // Internal function that returns an efficient (for current engines) version
+  // of the passed-in callback, to be repeatedly applied in other Underscore
+  // functions.
+  var createCallback = function(func, context, argCount) {
+    if (context === void 0) return func;
+    switch (argCount == null ? 3 : argCount) {
+      case 1: return function(value) {
+        return func.call(context, value);
+      };
+      case 2: return function(value, other) {
+        return func.call(context, value, other);
+      };
+      case 3: return function(value, index, collection) {
+        return func.call(context, value, index, collection);
+      };
+      case 4: return function(accumulator, value, index, collection) {
+        return func.call(context, accumulator, value, index, collection);
+      };
+    }
+    return function() {
+      return func.apply(context, arguments);
+    };
+  };
+
+  // A mostly-internal function to generate callbacks that can be applied
+  // to each element in a collection, returning the desired result — either
+  // identity, an arbitrary callback, a property matcher, or a property accessor.
+  _.iteratee = function(value, context, argCount) {
+    if (value == null) return _.identity;
+    if (_.isFunction(value)) return createCallback(value, context, argCount);
+    if (_.isObject(value)) return _.matches(value);
+    return _.property(value);
+  };
+
+  // Collection Functions
+  // --------------------
+
+  // The cornerstone, an `each` implementation, aka `forEach`.
+  // Handles raw objects in addition to array-likes. Treats all
+  // sparse array-likes as if they were dense.
+  _.each = _.forEach = function(obj, iteratee, context) {
+    if (obj == null) return obj;
+    iteratee = createCallback(iteratee, context);
+    var i, length = obj.length;
+    if (length === +length) {
+      for (i = 0; i < length; i++) {
+        iteratee(obj[i], i, obj);
+      }
+    } else {
+      var keys = _.keys(obj);
+      for (i = 0, length = keys.length; i < length; i++) {
+        iteratee(obj[keys[i]], keys[i], obj);
+      }
+    }
+    return obj;
+  };
+
+  // Return the results of applying the iteratee to each element.
+  _.map = _.collect = function(obj, iteratee, context) {
+    if (obj == null) return [];
+    iteratee = _.iteratee(iteratee, context);
+    var keys = obj.length !== +obj.length && _.keys(obj),
+        length = (keys || obj).length,
+        results = Array(length),
+        currentKey;
+    for (var index = 0; index < length; index++) {
+      currentKey = keys ? keys[index] : index;
+      results[index] = iteratee(obj[currentKey], currentKey, obj);
+    }
+    return results;
+  };
+
+  var reduceError = 'Reduce of empty array with no initial value';
+
+  // **Reduce** builds up a single result from a list of values, aka `inject`,
+  // or `foldl`.
+  _.reduce = _.foldl = _.inject = function(obj, iteratee, memo, context) {
+    if (obj == null) obj = [];
+    iteratee = createCallback(iteratee, context, 4);
+    var keys = obj.length !== +obj.length && _.keys(obj),
+        length = (keys || obj).length,
+        index = 0, currentKey;
+    if (arguments.length < 3) {
+      if (!length) throw new TypeError(reduceError);
+      memo = obj[keys ? keys[index++] : index++];
+    }
+    for (; index < length; index++) {
+      currentKey = keys ? keys[index] : index;
+      memo = iteratee(memo, obj[currentKey], currentKey, obj);
+    }
+    return memo;
+  };
+
+  // The right-associative version of reduce, also known as `foldr`.
+  _.reduceRight = _.foldr = function(obj, iteratee, memo, context) {
+    if (obj == null) obj = [];
+    iteratee = createCallback(iteratee, context, 4);
+    var keys = obj.length !== + obj.length && _.keys(obj),
+        index = (keys || obj).length,
+        currentKey;
+    if (arguments.length < 3) {
+      if (!index) throw new TypeError(reduceError);
+      memo = obj[keys ? keys[--index] : --index];
+    }
+    while (index--) {
+      currentKey = keys ? keys[index] : index;
+      memo = iteratee(memo, obj[currentKey], currentKey, obj);
+    }
+    return memo;
+  };
+
+  // Return the first value which passes a truth test. Aliased as `detect`.
+  _.find = _.detect = function(obj, predicate, context) {
+    var result;
+    predicate = _.iteratee(predicate, context);
+    _.some(obj, function(value, index, list) {
+      if (predicate(value, index, list)) {
+        result = value;
+        return true;
+      }
+    });
+    return result;
+  };
+
+  // Return all the elements that pass a truth test.
+  // Aliased as `select`.
+  _.filter = _.select = function(obj, predicate, context) {
+    var results = [];
+    if (obj == null) return results;
+    predicate = _.iteratee(predicate, context);
+    _.each(obj, function(value, index, list) {
+      if (predicate(value, index, list)) results.push(value);
+    });
+    return results;
+  };
+
+  // Return all the elements for which a truth test fails.
+  _.reject = function(obj, predicate, context) {
+    return _.filter(obj, _.negate(_.iteratee(predicate)), context);
+  };
+
+  // Determine whether all of the elements match a truth test.
+  // Aliased as `all`.
+  _.every = _.all = function(obj, predicate, context) {
+    if (obj == null) return true;
+    predicate = _.iteratee(predicate, context);
+    var keys = obj.length !== +obj.length && _.keys(obj),
+        length = (keys || obj).length,
+        index, currentKey;
+    for (index = 0; index < length; index++) {
+      currentKey = keys ? keys[index] : index;
+      if (!predicate(obj[currentKey], currentKey, obj)) return false;
+    }
+    return true;
+  };
+
+  // Determine if at least one element in the object matches a truth test.
+  // Aliased as `any`.
+  _.some = _.any = function(obj, predicate, context) {
+    if (obj == null) return false;
+    predicate = _.iteratee(predicate, context);
+    var keys = obj.length !== +obj.length && _.keys(obj),
+        length = (keys || obj).length,
+        index, currentKey;
+    for (index = 0; index < length; index++) {
+      currentKey = keys ? keys[index] : index;
+      if (predicate(obj[currentKey], currentKey, obj)) return true;
+    }
+    return false;
+  };
+
+  // Determine if the array or object contains a given value (using `===`).
+  // Aliased as `include`.
+  _.contains = _.include = function(obj, target) {
+    if (obj == null) return false;
+    if (obj.length !== +obj.length) obj = _.values(obj);
+    return _.indexOf(obj, target) >= 0;
+  };
+
+  // Invoke a method (with arguments) on every item in a collection.
+  _.invoke = function(obj, method) {
+    var args = slice.call(arguments, 2);
+    var isFunc = _.isFunction(method);
+    return _.map(obj, function(value) {
+      return (isFunc ? method : value[method]).apply(value, args);
+    });
+  };
+
+  // Convenience version of a common use case of `map`: fetching a property.
+  _.pluck = function(obj, key) {
+    return _.map(obj, _.property(key));
+  };
+
+  // Convenience version of a common use case of `filter`: selecting only objects
+  // containing specific `key:value` pairs.
+  _.where = function(obj, attrs) {
+    return _.filter(obj, _.matches(attrs));
+  };
+
+  // Convenience version of a common use case of `find`: getting the first object
+  // containing specific `key:value` pairs.
+  _.findWhere = function(obj, attrs) {
+    return _.find(obj, _.matches(attrs));
+  };
+
+  // Return the maximum element (or element-based computation).
+  _.max = function(obj, iteratee, context) {
+    var result = -Infinity, lastComputed = -Infinity,
+        value, computed;
+    if (iteratee == null && obj != null) {
+      obj = obj.length === +obj.length ? obj : _.values(obj);
+      for (var i = 0, length = obj.length; i < length; i++) {
+        value = obj[i];
+        if (value > result) {
+          result = value;
+        }
+      }
+    } else {
+      iteratee = _.iteratee(iteratee, context);
+      _.each(obj, function(value, index, list) {
+        computed = iteratee(value, index, list);
+        if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
+          result = value;
+          lastComputed = computed;
+        }
+      });
+    }
+    return result;
+  };
+
+  // Return the minimum element (or element-based computation).
+  _.min = function(obj, iteratee, context) {
+    var result = Infinity, lastComputed = Infinity,
+        value, computed;
+    if (iteratee == null && obj != null) {
+      obj = obj.length === +obj.length ? obj : _.values(obj);
+      for (var i = 0, length = obj.length; i < length; i++) {
+        value = obj[i];
+        if (value < result) {
+          result = value;
+        }
+      }
+    } else {
+      iteratee = _.iteratee(iteratee, context);
+      _.each(obj, function(value, index, list) {
+        computed = iteratee(value, index, list);
+        if (computed < lastComputed || computed === Infinity && result === Infinity) {
+          result = value;
+          lastComputed = computed;
+        }
+      });
+    }
+    return result;
+  };
+
+  // Shuffle a collection, using the modern version of the
+  // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
+  _.shuffle = function(obj) {
+    var set = obj && obj.length === +obj.length ? obj : _.values(obj);
+    var length = set.length;
+    var shuffled = Array(length);
+    for (var index = 0, rand; index < length; index++) {
+      rand = _.random(0, index);
+      if (rand !== index) shuffled[index] = shuffled[rand];
+      shuffled[rand] = set[index];
+    }
+    return shuffled;
+  };
+
+  // Sample **n** random values from a collection.
+  // If **n** is not specified, returns a single random element.
+  // The internal `guard` argument allows it to work with `map`.
+  _.sample = function(obj, n, guard) {
+    if (n == null || guard) {
+      if (obj.length !== +obj.length) obj = _.values(obj);
+      return obj[_.random(obj.length - 1)];
+    }
+    return _.shuffle(obj).slice(0, Math.max(0, n));
+  };
+
+  // Sort the object's values by a criterion produced by an iteratee.
+  _.sortBy = function(obj, iteratee, context) {
+    iteratee = _.iteratee(iteratee, context);
+    return _.pluck(_.map(obj, function(value, index, list) {
+      return {
+        value: value,
+        index: index,
+        criteria: iteratee(value, index, list)
+      };
+    }).sort(function(left, right) {
+      var a = left.criteria;
+      var b = right.criteria;
+      if (a !== b) {
+        if (a > b || a === void 0) return 1;
+        if (a < b || b === void 0) return -1;
+      }
+      return left.index - right.index;
+    }), 'value');
+  };
+
+  // An internal function used for aggregate "group by" operations.
+  var group = function(behavior) {
+    return function(obj, iteratee, context) {
+      var result = {};
+      iteratee = _.iteratee(iteratee, context);
+      _.each(obj, function(value, index) {
+        var key = iteratee(value, index, obj);
+        behavior(result, value, key);
+      });
+      return result;
+    };
+  };
+
+  // Groups the object's values by a criterion. Pass either a string attribute
+  // to group by, or a function that returns the criterion.
+  _.groupBy = group(function(result, value, key) {
+    if (_.has(result, key)) result[key].push(value); else result[key] = [value];
+  });
+
+  // Indexes the object's values by a criterion, similar to `groupBy`, but for
+  // when you know that your index values will be unique.
+  _.indexBy = group(function(result, value, key) {
+    result[key] = value;
+  });
+
+  // Counts instances of an object that group by a certain criterion. Pass
+  // either a string attribute to count by, or a function that returns the
+  // criterion.
+  _.countBy = group(function(result, value, key) {
+    if (_.has(result, key)) result[key]++; else result[key] = 1;
+  });
+
+  // Use a comparator function to figure out the smallest index at which
+  // an object should be inserted so as to maintain order. Uses binary search.
+  _.sortedIndex = function(array, obj, iteratee, context) {
+    iteratee = _.iteratee(iteratee, context, 1);
+    var value = iteratee(obj);
+    var low = 0, high = array.length;
+    while (low < high) {
+      var mid = low + high >>> 1;
+      if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
+    }
+    return low;
+  };
+
+  // Safely create a real, live array from anything iterable.
+  _.toArray = function(obj) {
+    if (!obj) return [];
+    if (_.isArray(obj)) return slice.call(obj);
+    if (obj.length === +obj.length) return _.map(obj, _.identity);
+    return _.values(obj);
+  };
+
+  // Return the number of elements in an object.
+  _.size = function(obj) {
+    if (obj == null) return 0;
+    return obj.length === +obj.length ? obj.length : _.keys(obj).length;
+  };
+
+  // Split a collection into two arrays: one whose elements all satisfy the given
+  // predicate, and one whose elements all do not satisfy the predicate.
+  _.partition = function(obj, predicate, context) {
+    predicate = _.iteratee(predicate, context);
+    var pass = [], fail = [];
+    _.each(obj, function(value, key, obj) {
+      (predicate(value, key, obj) ? pass : fail).push(value);
+    });
+    return [pass, fail];
+  };
+
+  // Array Functions
+  // ---------------
+
+  // Get the first element of an array. Passing **n** will return the first N
+  // values in the array. Aliased as `head` and `take`. The **guard** check
+  // allows it to work with `_.map`.
+  _.first = _.head = _.take = function(array, n, guard) {
+    if (array == null) return void 0;
+    if (n == null || guard) return array[0];
+    if (n < 0) return [];
+    return slice.call(array, 0, n);
+  };
+
+  // Returns everything but the last entry of the array. Especially useful on
+  // the arguments object. Passing **n** will return all the values in
+  // the array, excluding the last N. The **guard** check allows it to work with
+  // `_.map`.
+  _.initial = function(array, n, guard) {
+    return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
+  };
+
+  // Get the last element of an array. Passing **n** will return the last N
+  // values in the array. The **guard** check allows it to work with `_.map`.
+  _.last = function(array, n, guard) {
+    if (array == null) return void 0;
+    if (n == null || guard) return array[array.length - 1];
+    return slice.call(array, Math.max(array.length - n, 0));
+  };
+
+  // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
+  // Especially useful on the arguments object. Passing an **n** will return
+  // the rest N values in the array. The **guard**
+  // check allows it to work with `_.map`.
+  _.rest = _.tail = _.drop = function(array, n, guard) {
+    return slice.call(array, n == null || guard ? 1 : n);
+  };
+
+  // Trim out all falsy values from an array.
+  _.compact = function(array) {
+    return _.filter(array, _.identity);
+  };
+
+  // Internal implementation of a recursive `flatten` function.
+  var flatten = function(input, shallow, strict, output) {
+    if (shallow && _.every(input, _.isArray)) {
+      return concat.apply(output, input);
+    }
+    for (var i = 0, length = input.length; i < length; i++) {
+      var value = input[i];
+      if (!_.isArray(value) && !_.isArguments(value)) {
+        if (!strict) output.push(value);
+      } else if (shallow) {
+        push.apply(output, value);
+      } else {
+        flatten(value, shallow, strict, output);
+      }
+    }
+    return output;
+  };
+
+  // Flatten out an array, either recursively (by default), or just one level.
+  _.flatten = function(array, shallow) {
+    return flatten(array, shallow, false, []);
+  };
+
+  // Return a version of the array that does not contain the specified value(s).
+  _.without = function(array) {
+    return _.difference(array, slice.call(arguments, 1));
+  };
+
+  // Produce a duplicate-free version of the array. If the array has already
+  // been sorted, you have the option of using a faster algorithm.
+  // Aliased as `unique`.
+  _.uniq = _.unique = function(array, isSorted, iteratee, context) {
+    if (array == null) return [];
+    if (!_.isBoolean(isSorted)) {
+      context = iteratee;
+      iteratee = isSorted;
+      isSorted = false;
+    }
+    if (iteratee != null) iteratee = _.iteratee(iteratee, context);
+    var result = [];
+    var seen = [];
+    for (var i = 0, length = array.length; i < length; i++) {
+      var value = array[i];
+      if (isSorted) {
+        if (!i || seen !== value) result.push(value);
+        seen = value;
+      } else if (iteratee) {
+        var computed = iteratee(value, i, array);
+        if (_.indexOf(seen, computed) < 0) {
+          seen.push(computed);
+          result.push(value);
+        }
+      } else if (_.indexOf(result, value) < 0) {
+        result.push(value);
+      }
+    }
+    return result;
+  };
+
+  // Produce an array that contains the union: each distinct element from all of
+  // the passed-in arrays.
+  _.union = function() {
+    return _.uniq(flatten(arguments, true, true, []));
+  };
+
+  // Produce an array that contains every item shared between all the
+  // passed-in arrays.
+  _.intersection = function(array) {
+    if (array == null) return [];
+    var result = [];
+    var argsLength = arguments.length;
+    for (var i = 0, length = array.length; i < length; i++) {
+      var item = array[i];
+      if (_.contains(result, item)) continue;
+      for (var j = 1; j < argsLength; j++) {
+        if (!_.contains(arguments[j], item)) break;
+      }
+      if (j === argsLength) result.push(item);
+    }
+    return result;
+  };
+
+  // Take the difference between one array and a number of other arrays.
+  // Only the elements present in just the first array will remain.
+  _.difference = function(array) {
+    var rest = flatten(slice.call(arguments, 1), true, true, []);
+    return _.filter(array, function(value){
+      return !_.contains(rest, value);
+    });
+  };
+
+  // Zip together multiple lists into a single array -- elements that share
+  // an index go together.
+  _.zip = function(array) {
+    if (array == null) return [];
+    var length = _.max(arguments, 'length').length;
+    var results = Array(length);
+    for (var i = 0; i < length; i++) {
+      results[i] = _.pluck(arguments, i);
+    }
+    return results;
+  };
+
+  // Converts lists into objects. Pass either a single array of `[key, value]`
+  // pairs, or two parallel arrays of the same length -- one of keys, and one of
+  // the corresponding values.
+  _.object = function(list, values) {
+    if (list == null) return {};
+    var result = {};
+    for (var i = 0, length = list.length; i < length; i++) {
+      if (values) {
+        result[list[i]] = values[i];
+      } else {
+        result[list[i][0]] = list[i][1];
+      }
+    }
+    return result;
+  };
+
+  // Return the position of the first occurrence of an item in an array,
+  // or -1 if the item is not included in the array.
+  // If the array is large and already in sort order, pass `true`
+  // for **isSorted** to use binary search.
+  _.indexOf = function(array, item, isSorted) {
+    if (array == null) return -1;
+    var i = 0, length = array.length;
+    if (isSorted) {
+      if (typeof isSorted == 'number') {
+        i = isSorted < 0 ? Math.max(0, length + isSorted) : isSorted;
+      } else {
+        i = _.sortedIndex(array, item);
+        return array[i] === item ? i : -1;
+      }
+    }
+    for (; i < length; i++) if (array[i] === item) return i;
+    return -1;
+  };
+
+  _.lastIndexOf = function(array, item, from) {
+    if (array == null) return -1;
+    var idx = array.length;
+    if (typeof from == 'number') {
+      idx = from < 0 ? idx + from + 1 : Math.min(idx, from + 1);
+    }
+    while (--idx >= 0) if (array[idx] === item) return idx;
+    return -1;
+  };
+
+  // Generate an integer Array containing an arithmetic progression. A port of
+  // the native Python `range()` function. See
+  // [the Python documentation](http://docs.python.org/library/functions.html#range).
+  _.range = function(start, stop, step) {
+    if (arguments.length <= 1) {
+      stop = start || 0;
+      start = 0;
+    }
+    step = step || 1;
+
+    var length = Math.max(Math.ceil((stop - start) / step), 0);
+    var range = Array(length);
+
+    for (var idx = 0; idx < length; idx++, start += step) {
+      range[idx] = start;
+    }
+
+    return range;
+  };
+
+  // Function (ahem) Functions
+  // ------------------
+
+  // Reusable constructor function for prototype setting.
+  var Ctor = function(){};
+
+  // Create a function bound to a given object (assigning `this`, and arguments,
+  // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
+  // available.
+  _.bind = function(func, context) {
+    var args, bound;
+    if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
+    if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
+    args = slice.call(arguments, 2);
+    bound = function() {
+      if (!(this instanceof bound)) return func.apply(context, args.concat(slice.call(arguments)));
+      Ctor.prototype = func.prototype;
+      var self = new Ctor;
+      Ctor.prototype = null;
+      var result = func.apply(self, args.concat(slice.call(arguments)));
+      if (_.isObject(result)) return result;
+      return self;
+    };
+    return bound;
+  };
+
+  // Partially apply a function by creating a version that has had some of its
+  // arguments pre-filled, without changing its dynamic `this` context. _ acts
+  // as a placeholder, allowing any combination of arguments to be pre-filled.
+  _.partial = function(func) {
+    var boundArgs = slice.call(arguments, 1);
+    return function() {
+      var position = 0;
+      var args = boundArgs.slice();
+      for (var i = 0, length = args.length; i < length; i++) {
+        if (args[i] === _) args[i] = arguments[position++];
+      }
+      while (position < arguments.length) args.push(arguments[position++]);
+      return func.apply(this, args);
+    };
+  };
+
+  // Bind a number of an object's methods to that object. Remaining arguments
+  // are the method names to be bound. Useful for ensuring that all callbacks
+  // defined on an object belong to it.
+  _.bindAll = function(obj) {
+    var i, length = arguments.length, key;
+    if (length <= 1) throw new Error('bindAll must be passed function names');
+    for (i = 1; i < length; i++) {
+      key = arguments[i];
+      obj[key] = _.bind(obj[key], obj);
+    }
+    return obj;
+  };
+
+  // Memoize an expensive function by storing its results.
+  _.memoize = function(func, hasher) {
+    var memoize = function(key) {
+      var cache = memoize.cache;
+      var address = hasher ? hasher.apply(this, arguments) : key;
+      if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
+      return cache[address];
+    };
+    memoize.cache = {};
+    return memoize;
+  };
+
+  // Delays a function for the given number of milliseconds, and then calls
+  // it with the arguments supplied.
+  _.delay = function(func, wait) {
+    var args = slice.call(arguments, 2);
+    return setTimeout(function(){
+      return func.apply(null, args);
+    }, wait);
+  };
+
+  // Defers a function, scheduling it to run after the current call stack has
+  // cleared.
+  _.defer = function(func) {
+    return _.delay.apply(_, [func, 1].concat(slice.call(arguments, 1)));
+  };
+
+  // Returns a function, that, when invoked, will only be triggered at most once
+  // during a given window of time. Normally, the throttled function will run
+  // as much as it can, without ever going more than once per `wait` duration;
+  // but if you'd like to disable the execution on the leading edge, pass
+  // `{leading: false}`. To disable execution on the trailing edge, ditto.
+  _.throttle = function(func, wait, options) {
+    var context, args, result;
+    var timeout = null;
+    var previous = 0;
+    if (!options) options = {};
+    var later = function() {
+      previous = options.leading === false ? 0 : _.now();
+      timeout = null;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    };
+    return function() {
+      var now = _.now();
+      if (!previous && options.leading === false) previous = now;
+      var remaining = wait - (now - previous);
+      context = this;
+      args = arguments;
+      if (remaining <= 0 || remaining > wait) {
+        clearTimeout(timeout);
+        timeout = null;
+        previous = now;
+        result = func.apply(context, args);
+        if (!timeout) context = args = null;
+      } else if (!timeout && options.trailing !== false) {
+        timeout = setTimeout(later, remaining);
+      }
+      return result;
+    };
+  };
+
+  // Returns a function, that, as long as it continues to be invoked, will not
+  // be triggered. The function will be called after it stops being called for
+  // N milliseconds. If `immediate` is passed, trigger the function on the
+  // leading edge, instead of the trailing.
+  _.debounce = function(func, wait, immediate) {
+    var timeout, args, context, timestamp, result;
+
+    var later = function() {
+      var last = _.now() - timestamp;
+
+      if (last < wait && last > 0) {
+        timeout = setTimeout(later, wait - last);
+      } else {
+        timeout = null;
+        if (!immediate) {
+          result = func.apply(context, args);
+          if (!timeout) context = args = null;
+        }
+      }
+    };
+
+    return function() {
+      context = this;
+      args = arguments;
+      timestamp = _.now();
+      var callNow = immediate && !timeout;
+      if (!timeout) timeout = setTimeout(later, wait);
+      if (callNow) {
+        result = func.apply(context, args);
+        context = args = null;
+      }
+
+      return result;
+    };
+  };
+
+  // Returns the first function passed as an argument to the second,
+  // allowing you to adjust arguments, run code before and after, and
+  // conditionally execute the original function.
+  _.wrap = function(func, wrapper) {
+    return _.partial(wrapper, func);
+  };
+
+  // Returns a negated version of the passed-in predicate.
+  _.negate = function(predicate) {
+    return function() {
+      return !predicate.apply(this, arguments);
+    };
+  };
+
+  // Returns a function that is the composition of a list of functions, each
+  // consuming the return value of the function that follows.
+  _.compose = function() {
+    var args = arguments;
+    var start = args.length - 1;
+    return function() {
+      var i = start;
+      var result = args[start].apply(this, arguments);
+      while (i--) result = args[i].call(this, result);
+      return result;
+    };
+  };
+
+  // Returns a function that will only be executed after being called N times.
+  _.after = function(times, func) {
+    return function() {
+      if (--times < 1) {
+        return func.apply(this, arguments);
+      }
+    };
+  };
+
+  // Returns a function that will only be executed before being called N times.
+  _.before = function(times, func) {
+    var memo;
+    return function() {
+      if (--times > 0) {
+        memo = func.apply(this, arguments);
+      } else {
+        func = null;
+      }
+      return memo;
+    };
+  };
+
+  // Returns a function that will be executed at most one time, no matter how
+  // often you call it. Useful for lazy initialization.
+  _.once = _.partial(_.before, 2);
+
+  // Object Functions
+  // ----------------
+
+  // Retrieve the names of an object's properties.
+  // Delegates to **ECMAScript 5**'s native `Object.keys`
+  _.keys = function(obj) {
+    if (!_.isObject(obj)) return [];
+    if (nativeKeys) return nativeKeys(obj);
+    var keys = [];
+    for (var key in obj) if (_.has(obj, key)) keys.push(key);
+    return keys;
+  };
+
+  // Retrieve the values of an object's properties.
+  _.values = function(obj) {
+    var keys = _.keys(obj);
+    var length = keys.length;
+    var values = Array(length);
+    for (var i = 0; i < length; i++) {
+      values[i] = obj[keys[i]];
+    }
+    return values;
+  };
+
+  // Convert an object into a list of `[key, value]` pairs.
+  _.pairs = function(obj) {
+    var keys = _.keys(obj);
+    var length = keys.length;
+    var pairs = Array(length);
+    for (var i = 0; i < length; i++) {
+      pairs[i] = [keys[i], obj[keys[i]]];
+    }
+    return pairs;
+  };
+
+  // Invert the keys and values of an object. The values must be serializable.
+  _.invert = function(obj) {
+    var result = {};
+    var keys = _.keys(obj);
+    for (var i = 0, length = keys.length; i < length; i++) {
+      result[obj[keys[i]]] = keys[i];
+    }
+    return result;
+  };
+
+  // Return a sorted list of the function names available on the object.
+  // Aliased as `methods`
+  _.functions = _.methods = function(obj) {
+    var names = [];
+    for (var key in obj) {
+      if (_.isFunction(obj[key])) names.push(key);
+    }
+    return names.sort();
+  };
+
+  // Extend a given object with all the properties in passed-in object(s).
+  _.extend = function(obj) {
+    if (!_.isObject(obj)) return obj;
+    var source, prop;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+      source = arguments[i];
+      for (prop in source) {
+        if (hasOwnProperty.call(source, prop)) {
+            obj[prop] = source[prop];
+        }
+      }
+    }
+    return obj;
+  };
+
+  // Return a copy of the object only containing the whitelisted properties.
+  _.pick = function(obj, iteratee, context) {
+    var result = {}, key;
+    if (obj == null) return result;
+    if (_.isFunction(iteratee)) {
+      iteratee = createCallback(iteratee, context);
+      for (key in obj) {
+        var value = obj[key];
+        if (iteratee(value, key, obj)) result[key] = value;
+      }
+    } else {
+      var keys = concat.apply([], slice.call(arguments, 1));
+      obj = new Object(obj);
+      for (var i = 0, length = keys.length; i < length; i++) {
+        key = keys[i];
+        if (key in obj) result[key] = obj[key];
+      }
+    }
+    return result;
+  };
+
+   // Return a copy of the object without the blacklisted properties.
+  _.omit = function(obj, iteratee, context) {
+    if (_.isFunction(iteratee)) {
+      iteratee = _.negate(iteratee);
+    } else {
+      var keys = _.map(concat.apply([], slice.call(arguments, 1)), String);
+      iteratee = function(value, key) {
+        return !_.contains(keys, key);
+      };
+    }
+    return _.pick(obj, iteratee, context);
+  };
+
+  // Fill in a given object with default properties.
+  _.defaults = function(obj) {
+    if (!_.isObject(obj)) return obj;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+      var source = arguments[i];
+      for (var prop in source) {
+        if (obj[prop] === void 0) obj[prop] = source[prop];
+      }
+    }
+    return obj;
+  };
+
+  // Create a (shallow-cloned) duplicate of an object.
+  _.clone = function(obj) {
+    if (!_.isObject(obj)) return obj;
+    return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
+  };
+
+  // Invokes interceptor with the obj, and then returns obj.
+  // The primary purpose of this method is to "tap into" a method chain, in
+  // order to perform operations on intermediate results within the chain.
+  _.tap = function(obj, interceptor) {
+    interceptor(obj);
+    return obj;
+  };
+
+  // Internal recursive comparison function for `isEqual`.
+  var eq = function(a, b, aStack, bStack) {
+    // Identical objects are equal. `0 === -0`, but they aren't identical.
+    // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
+    if (a === b) return a !== 0 || 1 / a === 1 / b;
+    // A strict comparison is necessary because `null == undefined`.
+    if (a == null || b == null) return a === b;
+    // Unwrap any wrapped objects.
+    if (a instanceof _) a = a._wrapped;
+    if (b instanceof _) b = b._wrapped;
+    // Compare `[[Class]]` names.
+    var className = toString.call(a);
+    if (className !== toString.call(b)) return false;
+    switch (className) {
+      // Strings, numbers, regular expressions, dates, and booleans are compared by value.
+      case '[object RegExp]':
+      // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
+      case '[object String]':
+        // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
+        // equivalent to `new String("5")`.
+        return '' + a === '' + b;
+      case '[object Number]':
+        // `NaN`s are equivalent, but non-reflexive.
+        // Object(NaN) is equivalent to NaN
+        if (+a !== +a) return +b !== +b;
+        // An `egal` comparison is performed for other numeric values.
+        return +a === 0 ? 1 / +a === 1 / b : +a === +b;
+      case '[object Date]':
+      case '[object Boolean]':
+        // Coerce dates and booleans to numeric primitive values. Dates are compared by their
+        // millisecond representations. Note that invalid dates with millisecond representations
+        // of `NaN` are not equivalent.
+        return +a === +b;
+    }
+    if (typeof a != 'object' || typeof b != 'object') return false;
+    // Assume equality for cyclic structures. The algorithm for detecting cyclic
+    // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+    var length = aStack.length;
+    while (length--) {
+      // Linear search. Performance is inversely proportional to the number of
+      // unique nested structures.
+      if (aStack[length] === a) return bStack[length] === b;
+    }
+    // Objects with different constructors are not equivalent, but `Object`s
+    // from different frames are.
+    var aCtor = a.constructor, bCtor = b.constructor;
+    if (
+      aCtor !== bCtor &&
+      // Handle Object.create(x) cases
+      'constructor' in a && 'constructor' in b &&
+      !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
+        _.isFunction(bCtor) && bCtor instanceof bCtor)
+    ) {
+      return false;
+    }
+    // Add the first object to the stack of traversed objects.
+    aStack.push(a);
+    bStack.push(b);
+    var size, result;
+    // Recursively compare objects and arrays.
+    if (className === '[object Array]') {
+      // Compare array lengths to determine if a deep comparison is necessary.
+      size = a.length;
+      result = size === b.length;
+      if (result) {
+        // Deep compare the contents, ignoring non-numeric properties.
+        while (size--) {
+          if (!(result = eq(a[size], b[size], aStack, bStack))) break;
+        }
+      }
+    } else {
+      // Deep compare objects.
+      var keys = _.keys(a), key;
+      size = keys.length;
+      // Ensure that both objects contain the same number of properties before comparing deep equality.
+      result = _.keys(b).length === size;
+      if (result) {
+        while (size--) {
+          // Deep compare each member
+          key = keys[size];
+          if (!(result = _.has(b, key) && eq(a[key], b[key], aStack, bStack))) break;
+        }
+      }
+    }
+    // Remove the first object from the stack of traversed objects.
+    aStack.pop();
+    bStack.pop();
+    return result;
+  };
+
+  // Perform a deep comparison to check if two objects are equal.
+  _.isEqual = function(a, b) {
+    return eq(a, b, [], []);
+  };
+
+  // Is a given array, string, or object empty?
+  // An "empty" object has no enumerable own-properties.
+  _.isEmpty = function(obj) {
+    if (obj == null) return true;
+    if (_.isArray(obj) || _.isString(obj) || _.isArguments(obj)) return obj.length === 0;
+    for (var key in obj) if (_.has(obj, key)) return false;
+    return true;
+  };
+
+  // Is a given value a DOM element?
+  _.isElement = function(obj) {
+    return !!(obj && obj.nodeType === 1);
+  };
+
+  // Is a given value an array?
+  // Delegates to ECMA5's native Array.isArray
+  _.isArray = nativeIsArray || function(obj) {
+    return toString.call(obj) === '[object Array]';
+  };
+
+  // Is a given variable an object?
+  _.isObject = function(obj) {
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
+  };
+
+  // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
+  _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
+    _['is' + name] = function(obj) {
+      return toString.call(obj) === '[object ' + name + ']';
+    };
+  });
+
+  // Define a fallback version of the method in browsers (ahem, IE), where
+  // there isn't any inspectable "Arguments" type.
+  if (!_.isArguments(arguments)) {
+    _.isArguments = function(obj) {
+      return _.has(obj, 'callee');
+    };
+  }
+
+  // Optimize `isFunction` if appropriate. Work around an IE 11 bug.
+  if (typeof /./ !== 'function') {
+    _.isFunction = function(obj) {
+      return typeof obj == 'function' || false;
+    };
+  }
+
+  // Is a given object a finite number?
+  _.isFinite = function(obj) {
+    return isFinite(obj) && !isNaN(parseFloat(obj));
+  };
+
+  // Is the given value `NaN`? (NaN is the only number which does not equal itself).
+  _.isNaN = function(obj) {
+    return _.isNumber(obj) && obj !== +obj;
+  };
+
+  // Is a given value a boolean?
+  _.isBoolean = function(obj) {
+    return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
+  };
+
+  // Is a given value equal to null?
+  _.isNull = function(obj) {
+    return obj === null;
+  };
+
+  // Is a given variable undefined?
+  _.isUndefined = function(obj) {
+    return obj === void 0;
+  };
+
+  // Shortcut function for checking if an object has a given property directly
+  // on itself (in other words, not on a prototype).
+  _.has = function(obj, key) {
+    return obj != null && hasOwnProperty.call(obj, key);
+  };
+
+  // Utility Functions
+  // -----------------
+
+  // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
+  // previous owner. Returns a reference to the Underscore object.
+  _.noConflict = function() {
+    root._ = previousUnderscore;
+    return this;
+  };
+
+  // Keep the identity function around for default iteratees.
+  _.identity = function(value) {
+    return value;
+  };
+
+  _.constant = function(value) {
+    return function() {
+      return value;
+    };
+  };
+
+  _.noop = function(){};
+
+  _.property = function(key) {
+    return function(obj) {
+      return obj[key];
+    };
+  };
+
+  // Returns a predicate for checking whether an object has a given set of `key:value` pairs.
+  _.matches = function(attrs) {
+    var pairs = _.pairs(attrs), length = pairs.length;
+    return function(obj) {
+      if (obj == null) return !length;
+      obj = new Object(obj);
+      for (var i = 0; i < length; i++) {
+        var pair = pairs[i], key = pair[0];
+        if (pair[1] !== obj[key] || !(key in obj)) return false;
+      }
+      return true;
+    };
+  };
+
+  // Run a function **n** times.
+  _.times = function(n, iteratee, context) {
+    var accum = Array(Math.max(0, n));
+    iteratee = createCallback(iteratee, context, 1);
+    for (var i = 0; i < n; i++) accum[i] = iteratee(i);
+    return accum;
+  };
+
+  // Return a random integer between min and max (inclusive).
+  _.random = function(min, max) {
+    if (max == null) {
+      max = min;
+      min = 0;
+    }
+    return min + Math.floor(Math.random() * (max - min + 1));
+  };
+
+  // A (possibly faster) way to get the current timestamp as an integer.
+  _.now = Date.now || function() {
+    return new Date().getTime();
+  };
+
+   // List of HTML entities for escaping.
+  var escapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '`': '&#x60;'
+  };
+  var unescapeMap = _.invert(escapeMap);
+
+  // Functions for escaping and unescaping strings to/from HTML interpolation.
+  var createEscaper = function(map) {
+    var escaper = function(match) {
+      return map[match];
+    };
+    // Regexes for identifying a key that needs to be escaped
+    var source = '(?:' + _.keys(map).join('|') + ')';
+    var testRegexp = RegExp(source);
+    var replaceRegexp = RegExp(source, 'g');
+    return function(string) {
+      string = string == null ? '' : '' + string;
+      return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+    };
+  };
+  _.escape = createEscaper(escapeMap);
+  _.unescape = createEscaper(unescapeMap);
+
+  // If the value of the named `property` is a function then invoke it with the
+  // `object` as context; otherwise, return it.
+  _.result = function(object, property) {
+    if (object == null) return void 0;
+    var value = object[property];
+    return _.isFunction(value) ? object[property]() : value;
+  };
+
+  // Generate a unique integer id (unique within the entire client session).
+  // Useful for temporary DOM ids.
+  var idCounter = 0;
+  _.uniqueId = function(prefix) {
+    var id = ++idCounter + '';
+    return prefix ? prefix + id : id;
+  };
+
+  // By default, Underscore uses ERB-style template delimiters, change the
+  // following template settings to use alternative delimiters.
+  _.templateSettings = {
+    evaluate    : /<%([\s\S]+?)%>/g,
+    interpolate : /<%=([\s\S]+?)%>/g,
+    escape      : /<%-([\s\S]+?)%>/g
+  };
+
+  // When customizing `templateSettings`, if you don't want to define an
+  // interpolation, evaluation or escaping regex, we need one that is
+  // guaranteed not to match.
+  var noMatch = /(.)^/;
+
+  // Certain characters need to be escaped so that they can be put into a
+  // string literal.
+  var escapes = {
+    "'":      "'",
+    '\\':     '\\',
+    '\r':     'r',
+    '\n':     'n',
+    '\u2028': 'u2028',
+    '\u2029': 'u2029'
+  };
+
+  var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
+
+  var escapeChar = function(match) {
+    return '\\' + escapes[match];
+  };
+
+  // JavaScript micro-templating, similar to John Resig's implementation.
+  // Underscore templating handles arbitrary delimiters, preserves whitespace,
+  // and correctly escapes quotes within interpolated code.
+  // NB: `oldSettings` only exists for backwards compatibility.
+  _.template = function(text, settings, oldSettings) {
+    if (!settings && oldSettings) settings = oldSettings;
+    settings = _.defaults({}, settings, _.templateSettings);
+
+    // Combine delimiters into one regular expression via alternation.
+    var matcher = RegExp([
+      (settings.escape || noMatch).source,
+      (settings.interpolate || noMatch).source,
+      (settings.evaluate || noMatch).source
+    ].join('|') + '|$', 'g');
+
+    // Compile the template source, escaping string literals appropriately.
+    var index = 0;
+    var source = "__p+='";
+    text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
+      source += text.slice(index, offset).replace(escaper, escapeChar);
+      index = offset + match.length;
+
+      if (escape) {
+        source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
+      } else if (interpolate) {
+        source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
+      } else if (evaluate) {
+        source += "';\n" + evaluate + "\n__p+='";
+      }
+
+      // Adobe VMs need the match returned to produce the correct offest.
+      return match;
+    });
+    source += "';\n";
+
+    // If a variable is not specified, place data values in local scope.
+    if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
+
+    source = "var __t,__p='',__j=Array.prototype.join," +
+      "print=function(){__p+=__j.call(arguments,'');};\n" +
+      source + 'return __p;\n';
+
+    try {
+      var render = new Function(settings.variable || 'obj', '_', source);
+    } catch (e) {
+      e.source = source;
+      throw e;
+    }
+
+    var template = function(data) {
+      return render.call(this, data, _);
+    };
+
+    // Provide the compiled source as a convenience for precompilation.
+    var argument = settings.variable || 'obj';
+    template.source = 'function(' + argument + '){\n' + source + '}';
+
+    return template;
+  };
+
+  // Add a "chain" function. Start chaining a wrapped Underscore object.
+  _.chain = function(obj) {
+    var instance = _(obj);
+    instance._chain = true;
+    return instance;
+  };
+
+  // OOP
+  // ---------------
+  // If Underscore is called as a function, it returns a wrapped object that
+  // can be used OO-style. This wrapper holds altered versions of all the
+  // underscore functions. Wrapped objects may be chained.
+
+  // Helper function to continue chaining intermediate results.
+  var result = function(obj) {
+    return this._chain ? _(obj).chain() : obj;
+  };
+
+  // Add your own custom functions to the Underscore object.
+  _.mixin = function(obj) {
+    _.each(_.functions(obj), function(name) {
+      var func = _[name] = obj[name];
+      _.prototype[name] = function() {
+        var args = [this._wrapped];
+        push.apply(args, arguments);
+        return result.call(this, func.apply(_, args));
+      };
+    });
+  };
+
+  // Add all of the Underscore functions to the wrapper object.
+  _.mixin(_);
+
+  // Add all mutator Array functions to the wrapper.
+  _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
+    var method = ArrayProto[name];
+    _.prototype[name] = function() {
+      var obj = this._wrapped;
+      method.apply(obj, arguments);
+      if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
+      return result.call(this, obj);
+    };
+  });
+
+  // Add all accessor Array functions to the wrapper.
+  _.each(['concat', 'join', 'slice'], function(name) {
+    var method = ArrayProto[name];
+    _.prototype[name] = function() {
+      return result.call(this, method.apply(this._wrapped, arguments));
+    };
+  });
+
+  // Extracts the result from a wrapped and chained object.
+  _.prototype.value = function() {
+    return this._wrapped;
+  };
+
+  // AMD registration happens at the end for compatibility with AMD loaders
+  // that may not enforce next-turn semantics on modules. Even though general
+  // practice for AMD registration is to be anonymous, underscore registers
+  // as a named module because, like jQuery, it is a base library that is
+  // popular enough to be bundled in a third party lib, but not be part of
+  // an AMD load request. Those cases could generate an error when an
+  // anonymous define() is called outside of a loader request.
+  if (typeof define === 'function' && define.amd) {
+    define('underscore', [], function() {
+      return _;
+    });
+  }
+}.call(this));
+
 },{}],"Wu6dvS":[function(require,module,exports){
 var Loader = function() {
 
   // will be replaced with the json.
-  this.dependencies = {"npm":{"json-editor":"latest","handlebars":"latest"}};
+  this.dependencies = {"npm":{"json-editor":"latest","handlebars":"latest","underscore":"1.x.x"}};
   //this.nodes = ;
-  this.nodeDefinitions = {"https://serve-chix.rhcloud.com/nodes/{ns}/{name}":{"json-editor":{"editor":{"_id":"54b36348b314b122580582fa","name":"editor","ns":"json-editor","title":"JSON Editor","description":"JSON Editor","async":true,"phrases":{"active":"Creating JSON Editor"},"dependencies":{"npm":{"json-editor":"latest"}},"ports":{"input":{"element":{"title":"Element","description":"Element","type":"HTMLElement"},"in":{"title":"Json","type":"object","description":"JSON Object","async":true},"schema":{"title":"Schema","type":"object","description":"A valid JSON Schema to use for the editor. Version 3 and Version 4 of the draft specification are supported.","async":true},"enable":{"title":"Enable","description":"Enable","async":true},"disable":{"title":"Disable","description":"Disable","async":true},"options":{"title":"Options","type":"object","properties":{"ajax":{"title":"Ajax","description":"If true, JSON Editor will load external URLs in $ref via ajax.","default":false},"disable_array_add":{"title":"Disable array add","description":"If true, remove all `add row` buttons from arrays.","default":false},"disable_array_delete":{"title":"Disable array delete","description":"If true, remove all `delete row` buttons from arrays.","default":false},"disable_array_reorder":{"title":"Disable array reorder","description":"If true, remove all `move up` and `move down` buttons from arrays.","default":false},"disable_collapse":{"title":"Disable collapse","description":"If true, remove all collapse buttons from objects and arrays.","default":false},"disable_edit_json":{"title":"Disable edit json","description":"If true, remove all Edit JSON buttons from objects.","default":false},"disable_properties":{"title":"Disable properties","description":"If true, remove all Edit Properties buttons from objects.","default":false},"form_name_root":{"title":"Form name root","description":"The first part of the `name` attribute of form inputs in the editor. An full example name is `root[person][name]` where `root` is the form_name_root.","default":"root"},"iconlib":{"title":"Iconlib","description":"The icon library to use for the editor. See the CSS Integration section below for more info.","default":null},"no_additional_properties":{"title":"No additional properties","description":"If true, objects can only contain properties defined with the properties keyword.","default":false},"refs":{"title":"Refs","description":"An object containing schema definitions for URLs. Allows you to pre-define external schemas.","default":{}},"required_by_default":{"title":"Required by default","description":"If true, all schemas that don't explicitly set the required property will be required.","default":false},"show_errors":{"title":"Show errors","description":"When to show validation errors in the UI. Valid values are interaction, change, always, and never.","default":"interaction"},"startval":{"title":"Start value","description":" Seed the editor with an initial value. This should be valid against the editor's schema.","default":null},"template":{"title":"Template","description":"The JS template engine to use. See the Templates and Variables section below for more info.","default":"default"},"theme":{"title":"Theme","description":"The CSS theme to use. See the CSS Integration section below for more info.","default":"html"}}}},"output":{"out":{"title":"out","type":"string"}}},"fn":"on.input.in = function() {\n  state.in = data;\n  if (state.jsonEditor) {\n    state.jsonEditor.setValue(state.in);\n  }\n};\n\non.input.schema = function() {\n  state.schema = input.options.schema = input.schema;\n  if (state.jsonEditor) {\n    state.jsonEditor.destroy();\n  }\n  state.jsonEditor = new json_editor(input.element, input.options);\n  // problem if state.in is not about this schema..\n  if (state.in) {\n    state.jsonEditor.setValue(state.in);\n  }\n  state.jsonEditor.on('change', function() {\n    output({out: state.jsonEditor.getValue()});\n  });\n};\n\non.input.enable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.enable();\n  }\n};\n\non.input.disable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.disable();\n  }\n};\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}},"dom":{"querySelector":{"_id":"527299bb30b8af4b8910216b","name":"querySelector","ns":"dom","title":"querySelector","description":"[Document query selector](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelector)","expose":["document"],"phrases":{"active":"Gathering elements matching criteria: {{input.selector}}"},"ports":{"input":{"element":{"title":"Element","type":"HTMLElement","default":null},"selector":{"title":"Selector","type":"string"}},"output":{"element":{"title":"Element","type":"HTMLElement"},"selection":{"title":"Selection","type":"HTMLElement"},"error":{"title":"Error","type":"Error"}}},"fn":"var el = input.element ? input.element : document;\noutput = {\n  element: el\n};\n\nvar selection = el.querySelector(input.selector);\nif(selection) {\n  output.selection = selection;\n} else {\n  output.error = Error('Selector ' + input.selector + ' did not match');\n}\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"},"setHtml":{"_id":"52be32d46a14bb6fbd924a24","name":"setHtml","ns":"dom","description":"dom setHtml","async":true,"phrases":{"active":"Adding html"},"ports":{"input":{"element":{"type":"HTMLElement","title":"Dom Element"},"html":{"type":"string","format":"html","title":"html","async":true}},"output":{"element":{"type":"HTMLElement","title":"Dom Element"}}},"fn":"on.input.html = function(data) {\n  input.element.innerHTML = data;\n  output({ element: input.element });\n};\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}},"object":{"create":{"_id":"52fa908e909495ebbe6ded4c","name":"create","ns":"object","async":true,"description":"Create an object, if input is a direct object it just returns a copy of the object","phrases":{"active":"Creating object"},"ports":{"input":{"in":{"title":"Object","type":"object","async":true}},"output":{"out":{"title":"out","type":"object"}}},"fn":"on.input.in = function(data) { output({out: data}); };\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}},"console":{"log":{"_id":"52645993df5da0102500004e","name":"log","ns":"console","description":"Console log","async":true,"phrases":{"active":"Logging to console"},"ports":{"input":{"msg":{"type":"any","title":"Log message","description":"Logs a message to the console","async":true,"required":true}},"output":{"out":{"type":"any","title":"Log message"}}},"fn":"on.input.msg = function() {\n  console.log(data);\n  output( { out: data });\n}\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}},"template":{"handlebars":{"_id":"52ea878d1905561c7aa3bdbc","name":"handlebars","ns":"template","description":"Handlebars Template engine","phrases":{"active":"Compiling handlebars template"},"ports":{"input":{"body":{"type":"string","format":"html","title":"Template body","description":"The body of the handlebars template","required":true},"vars":{"type":"object","title":"Input variables","description":"the input variables for this template","default":{}},"handlebars":{"type":"function","title":"Handlebars","default":null}},"output":{"out":{"title":"HTML","type":"string"}}},"dependencies":{"npm":{"handlebars":"latest"}},"fn":"var hb = input.handlebars || handlebars;\nvar tpl = hb.compile(input.body);\noutput = {\n  out: tpl(input.vars)\n}\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}}}};
+  this.nodeDefinitions = {"https://serve-chix.rhcloud.com/nodes/{ns}/{name}":{"json-editor":{"editor":{"_id":"54b36348b314b122580582fa","name":"editor","ns":"json-editor","title":"JSON Editor","description":"JSON Editor","async":true,"phrases":{"active":"Creating JSON Editor"},"dependencies":{"npm":{"json-editor":"latest"}},"ports":{"input":{"element":{"title":"Element","description":"Element","type":"HTMLElement"},"in":{"title":"Json","type":"object","description":"JSON Object","async":true},"schema":{"title":"Schema","type":"object","description":"A valid JSON Schema to use for the editor. Version 3 and Version 4 of the draft specification are supported.","async":true},"enable":{"title":"Enable","description":"Enable","async":true},"disable":{"title":"Disable","description":"Disable","async":true},"options":{"title":"Options","type":"object","properties":{"ajax":{"title":"Ajax","description":"If true, JSON Editor will load external URLs in $ref via ajax.","default":false},"disable_array_add":{"title":"Disable array add","description":"If true, remove all `add row` buttons from arrays.","default":false},"disable_array_delete":{"title":"Disable array delete","description":"If true, remove all `delete row` buttons from arrays.","default":false},"disable_array_reorder":{"title":"Disable array reorder","description":"If true, remove all `move up` and `move down` buttons from arrays.","default":false},"disable_collapse":{"title":"Disable collapse","description":"If true, remove all collapse buttons from objects and arrays.","default":false},"disable_edit_json":{"title":"Disable edit json","description":"If true, remove all Edit JSON buttons from objects.","default":false},"disable_properties":{"title":"Disable properties","description":"If true, remove all Edit Properties buttons from objects.","default":false},"form_name_root":{"title":"Form name root","description":"The first part of the `name` attribute of form inputs in the editor. An full example name is `root[person][name]` where `root` is the form_name_root.","default":"root"},"iconlib":{"title":"Iconlib","description":"The icon library to use for the editor. See the CSS Integration section below for more info.","default":null},"no_additional_properties":{"title":"No additional properties","description":"If true, objects can only contain properties defined with the properties keyword.","default":false},"refs":{"title":"Refs","description":"An object containing schema definitions for URLs. Allows you to pre-define external schemas.","default":{}},"required_by_default":{"title":"Required by default","description":"If true, all schemas that don't explicitly set the required property will be required.","default":false},"show_errors":{"title":"Show errors","description":"When to show validation errors in the UI. Valid values are interaction, change, always, and never.","default":"interaction"},"startval":{"title":"Start value","description":" Seed the editor with an initial value. This should be valid against the editor's schema.","default":null},"template":{"title":"Template","description":"The JS template engine to use. See the Templates and Variables section below for more info.","default":"default"},"theme":{"title":"Theme","description":"The CSS theme to use. See the CSS Integration section below for more info.","default":"html"}}}},"output":{"out":{"title":"out","type":"string"}}},"fn":"on.input.in = function() {\n  state.in = data;\n  if (state.jsonEditor) {\n    state.jsonEditor.setValue(state.in);\n  }\n};\n\non.input.schema = function() {\n  state.schema = input.options.schema = input.schema;\n  if (state.jsonEditor) {\n    state.jsonEditor.destroy();\n  }\n  state.jsonEditor = new json_editor(input.element, input.options);\n  // problem if state.in is not about this schema..\n  if (state.in) {\n    state.jsonEditor.setValue(state.in);\n  }\n  state.jsonEditor.on('change', function() {\n    output({out: state.jsonEditor.getValue()});\n  });\n};\n\non.input.enable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.enable();\n  }\n};\n\non.input.disable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.disable();\n  }\n};\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}},"dom":{"querySelector":{"_id":"527299bb30b8af4b8910216b","name":"querySelector","ns":"dom","title":"querySelector","description":"[Document query selector](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelector)","expose":["document"],"phrases":{"active":"Gathering elements matching criteria: {{input.selector}}"},"ports":{"input":{"element":{"title":"Element","type":"HTMLElement","default":null},"selector":{"title":"Selector","type":"string"}},"output":{"element":{"title":"Element","type":"HTMLElement"},"selection":{"title":"Selection","type":"HTMLElement"},"error":{"title":"Error","type":"Error"}}},"fn":"var el = input.element ? input.element : document;\noutput = {\n  element: el\n};\n\nvar selection = el.querySelector(input.selector);\nif(selection) {\n  output.selection = selection;\n} else {\n  output.error = Error('Selector ' + input.selector + ' did not match');\n}\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"},"setHtml":{"_id":"52be32d46a14bb6fbd924a24","name":"setHtml","ns":"dom","description":"dom setHtml","async":true,"phrases":{"active":"Adding html"},"ports":{"input":{"element":{"type":"HTMLElement","title":"Dom Element"},"html":{"type":"string","format":"html","title":"html","async":true}},"output":{"element":{"type":"HTMLElement","title":"Dom Element"}}},"fn":"on.input.html = function(data) {\n  input.element.innerHTML = data;\n  output({ element: input.element });\n};\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}},"object":{"create":{"_id":"52fa908e909495ebbe6ded4c","name":"create","ns":"object","async":true,"description":"Create an object, if input is a direct object it just returns a copy of the object","phrases":{"active":"Creating object"},"ports":{"input":{"in":{"title":"Object","type":"object","async":true}},"output":{"out":{"title":"out","type":"object"}}},"fn":"on.input.in = function(data) { output({out: data}); };\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"},"extend":{"_id":"52ef362fcf8e1bab142d537e","name":"extend","ns":"object","async":true,"description":"Copy all of the properties in the source objects over to the destination object, and return the destination object. It's in-order, so the last source will override properties of the same name in previous arguments.","phrases":{"active":"Extending object"},"ports":{"input":{"in":{"title":"Object","type":"object","async":true},"source":{"title":"Source Objects","type":"array","async":true}},"output":{"out":{"title":"out","type":"object"}}},"dependencies":{"npm":{"underscore":"1.x.x"}},"fn":"state.extend = underscore.extend.apply;\nstate.args = null;\nstate.source = null;\n\non.input.in = function(data) {\n  if(state.args) {\n     state.args.unshift(data);\n     output({out: state.extend(null, state.args)});\n     state.args = null;\n  } else {\n    state.args = [data];\n  }\n};\n\non.input.source = function(data) {\n\n  if(state.args) {\n     state.args.push(data);\n     output({out: state.extend(null, state.args)});\n     state.args = null;\n  } else {\n    state.args = [data];\n  }\n\n};\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}},"console":{"log":{"_id":"52645993df5da0102500004e","name":"log","ns":"console","description":"Console log","async":true,"phrases":{"active":"Logging to console"},"ports":{"input":{"msg":{"type":"any","title":"Log message","description":"Logs a message to the console","async":true,"required":true}},"output":{"out":{"type":"any","title":"Log message"}}},"fn":"on.input.msg = function() {\n  console.log(data);\n  output( { out: data });\n}\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}},"template":{"handlebars":{"_id":"52ea878d1905561c7aa3bdbc","name":"handlebars","ns":"template","description":"Handlebars Template engine","phrases":{"active":"Compiling handlebars template"},"ports":{"input":{"body":{"type":"string","format":"html","title":"Template body","description":"The body of the handlebars template","required":true},"vars":{"type":"object","title":"Input variables","description":"the input variables for this template","default":{}},"handlebars":{"type":"function","title":"Handlebars","default":null}},"output":{"out":{"title":"HTML","type":"string"}}},"dependencies":{"npm":{"handlebars":"latest"}},"fn":"var hb = input.handlebars || handlebars;\nvar tpl = hb.compile(input.body);\noutput = {\n  out: tpl(input.vars)\n}\n","provider":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}}}};
 
 };
 
@@ -24925,7 +26344,7 @@ Loader.prototype.getNodeDefinition = function(node, map) {
 var Flow = require('chix-flow').Flow;
 var loader = new Loader();
 
-var map = {"type":"flow","nodes":[{"id":"ModelEditor","title":"ModelEditor","ns":"json-editor","name":"editor"},{"id":"BodyEl","title":"BodyEl","ns":"dom","name":"querySelector","context":{"selector":"#form"}},{"id":"OutputEl","title":"OutputEl","ns":"dom","name":"querySelector","context":{"selector":"#output"}},{"id":"UpdateOutput","title":"UpdateOutput","ns":"dom","name":"setHtml"},{"id":"EditorDefaults","title":"EditorDefaults","ns":"object","name":"create"},{"id":"Log","title":"Log","ns":"console","name":"log"},{"id":"Template","title":"Template","ns":"template","name":"handlebars","context":{"body":"<article>\n\t<header id=\"header\">\n\t\t<div class=\"container\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-9 col-sm-push-3\">\n\t\t\t\t\t{{#resume.basics}}\n\t\t\t\t\t{{#name}}\n\t\t\t\t\t<h1>\n\t\t\t\t\t\t{{.}}\n\t\t\t\t\t</h1>\n\t\t\t\t\t{{/name}}\n\t\t\t\t\t{{#label}}\n\t\t\t\t\t<h2>\n\t\t\t\t\t\t{{.}}\n\t\t\t\t\t</h2>\n\t\t\t\t\t{{/label}}\n\t\t\t\t\t{{/resume.basics}}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</header>\n\n\t<div id=\"content\" class=\"container\">\n\n\t{{#resume.basics}}\n\t<section id=\"contact\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Contact</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#email}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t<strong>Email</strong>\n\t\t\t\t<div class=\"email\">{{.}}</div>\n\t\t\t</div>\n\t\t\t{{/email}}\n\t\t\t{{#phone}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t<strong>Phone</strong>\n\t\t\t\t<div class=\"phone\">{{.}}</div>\n\t\t\t</div>\n\t\t\t{{/phone}}\n\t\t\t{{#website}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t<strong>Website</strong>\n\t\t\t\t<div class=\"website\">\n\t\t\t\t\t<a href=\"{{.}}\">{{.}}</a>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t{{/website}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t<section id=\"about\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>About</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t{{#summary}}\n\t\t\t<p>{{.}}</p>\n\t\t{{/summary}}\n\t\t</div>\n\t</section>\n\t{{#if profiles.length}}\n\t<section id=\"profiles\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Profiles</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t\t{{#profiles}}\n\t\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t\t{{#network}}\n\t\t\t\t\t<strong class=\"network\">\n\t\t\t\t\t\t{{.}}\n\t\t\t\t\t</strong>\n\t\t\t\t\t{{/network}}\n\t\t\t\t\t{{#if username}}\n\t\t\t\t\t<div class=\"username\">\n\t\t\t\t\t\t{{#if url}}\n\t\t\t\t\t\t<div class=\"url\">\n\t\t\t\t\t\t\t<a href=\"{{url}}\">{{username}}</a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t{{else}}\n\t\t\t\t\t\t\t{{username}}\n\t\t\t\t\t\t{{/if}}\n\t\t\t\t\t</div>\n\t\t\t\t\t{{else}}\n\t\t\t\t\t\t{{#if url}}\n\t\t\t\t\t\t<div class=\"url\">\n\t\t\t\t\t\t\t<a href=\"{{url}}\">{{url}}</a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t{{/if}}\n\t\t\t\t\t{{/if}}\n\t\t\t\t</div>\n\t\t\t\t{{/profiles}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\t{{/resume.basics}}\n\n\t{{#if resume.work.length}}\n\t<section id=\"work\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Work</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.work}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{company}}</span>\n\t\t\t\t\t<span class=\"date\">\n\t\t\t\t\t\t{{startDate}} — {{endDate}}\n\t\t\t\t\t</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#website}}\n\t\t\t\t<div class=\"website pull-right\">\n\t\t\t\t\t<a href=\"{{.}}\">{{.}}</a>\n\t\t\t\t</div>\n\t\t\t\t{{/website}}\n\t\t\t\t{{#position}}\n\t\t\t\t<div class=\"position\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/position}}\n\t\t\t\t{{#summary}}\n\t\t\t\t<div class=\"summary\">\n\t\t\t\t\t<p>{{.}}</p>\n\t\t\t\t</div>\n\t\t\t\t{{/summary}}\n\t\t\t\t{{#if highlights.length}}\n\t\t\t\t<h4>Highlights</h4>\n\t\t\t\t<ul class=\"highlights\">\n\t\t\t\t\t{{#highlights}}\n\t\t\t\t\t<li class=\"bullet\">{{.}}</li>\n\t\t\t\t\t{{/highlights}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.volunteer.length}}\n\t<section id=\"volunteer\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Volunteer</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.volunteer}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{organization}}</span>\n\t\t\t\t\t<span class=\"date\">\n\t\t\t\t\t\t{{startDate}} — {{endDate}}\n\t\t\t\t\t</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#website}}\n\t\t\t\t<div class=\"website pull-right\">\n\t\t\t\t\t<a href=\"{{.}}\">{{.}}</a>\n\t\t\t\t</div>\n\t\t\t\t{{/website}}\n\t\t\t\t{{#position}}\n\t\t\t\t<div class=\"position\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/position}}\n\t\t\t\t{{#summary}}\n\t\t\t\t<div class=\"summary\">\n\t\t\t\t\t<p>{{.}}</p>\n\t\t\t\t</div>\n\t\t\t\t{{/summary}}\n\t\t\t\t{{#if highlights.length}}\n\t\t\t\t<h4>Highlights</h4>\n\t\t\t\t<ul class=\"highlights\">\n\t\t\t\t\t{{#highlights}}\n\t\t\t\t\t<li class=\"bullet\">{{.}}</li>\n\t\t\t\t\t{{/highlights}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.education.length}}\n\t<section id=\"education\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Education</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.education}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{institution}}</span>\n\t\t\t\t\t<span class=\"date\">\n\t\t\t\t\t\t{{startDate}} — {{endDate}}\n\t\t\t\t\t</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#area}}\n\t\t\t\t<div class=\"area\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/area}}\n\t\t\t\t{{#studyType}}\n\t\t\t\t<div class=\"studyType\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/studyType}}\n\t\t\t\t{{#if courses.length}}\n\t\t\t\t<h4>Courses</h4>\n\t\t\t\t<ul class=\"courses\">\n\t\t\t\t\t{{#courses}}\n\t\t\t\t\t<li>{{.}}</li>\n\t\t\t\t\t{{/courses}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.awards.length}}\n\t<section id=\"awards\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Awards</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.awards}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{title}}</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#date}}\n\t\t\t\t<div class=\"date pull-right\">\n\t\t\t\t\t<em>Awarded</em>\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/date}}\n\t\t\t\t{{#awarder}}\n\t\t\t\t<div class=\"awarder\">\n\t\t\t\t\t<em>by</em>\n\t\t\t\t\t<strong>{{.}}</strong>\n\t\t\t\t</div>\n\t\t\t\t{{/awarder}}\n\t\t\t\t{{#summary}}\n\t\t\t\t<div class=\"summary\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/summary}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.publications.length}}\n\t<section id=\"publications\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Publications</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.publications}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{name}}</span>\n\t\t\t\t\t<span class=\"date\">\n\t\t\t\t\t\t{{releaseDate}}\n\t\t\t\t\t</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#website}}\n\t\t\t\t<div class=\"website pull-right\">\n\t\t\t\t\t<a href=\"{{.}}\"></a>\n\t\t\t\t</div>\n\t\t\t\t{{/website}}\n\t\t\t\t{{#publisher}}\n\t\t\t\t<div class=\"publisher\">\n\t\t\t\t\t<em>Published by</em>\n\t\t\t\t\t<strong>{{.}}</strong>\n\t\t\t\t</div>\n\t\t\t\t{{/publisher}}\n\t\t\t\t{{#summary}}\n\t\t\t\t<div class=\"summary\">\n\t\t\t\t\t<p>{{.}}</p>\n\t\t\t\t</div>\n\t\t\t\t{{/summary}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.skills.length}}\n\t<section id=\"skills\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Skills</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.skills}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t{{#name}}\n\t\t\t\t<div class=\"name\">\n\t\t\t\t\t<h4>{{.}}</h4>\n\t\t\t\t</div>\n\t\t\t\t{{/name}}\n\t\t\t\t{{#if keywords.length}}\n\t\t\t\t<ul class=\"keywords\">\n\t\t\t\t\t{{#keywords}}\n\t\t\t\t\t<li>{{.}}</li>\n\t\t\t\t\t{{/keywords}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.languages.length}}\n\t<section id=\"languages\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Languages</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.languages}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t{{#language}}\n\t\t\t\t<div class=\"language\">\n\t\t\t\t\t<strong>{{.}}</strong>\n\t\t\t\t</div>\n\t\t\t\t{{/language}}\n\t\t\t\t{{#fluency}}\n\t\t\t\t<div class=\"fluency\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/fluency}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.interests.length}}\n\t<section id=\"interests\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Interests</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.interests}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t{{#name}}\n\t\t\t\t<div class=\"name\">\n\t\t\t\t\t<h4>{{.}}</h4>\n\t\t\t\t</div>\n\t\t\t\t{{/name}}\n\t\t\t\t{{#if keywords.length}}\n\t\t\t\t<ul class=\"keywords\">\n\t\t\t\t\t{{#keywords}}\n\t\t\t\t\t<li>{{.}}</li>\n\t\t\t\t\t{{/keywords}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.references.length}}\n\t<section id=\"references\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>References</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.references}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t{{#if reference}}\n\t\t\t\t<blockquote class=\"reference\">\n\t\t\t\t\t<p>{{reference}}</p>\n\t\t\t\t\t{{#name}}\n\t\t\t\t\t<p class=\"name\">\n\t\t\t\t\t\t<strong>— {{.}}</strong>\n\t\t\t\t\t</p>\n\t\t\t\t\t{{/name}}\n\t\t\t\t</blockquote>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t</div>\n</article>\n"}}],"links":[{"source":{"id":"BodyEl","port":"selection"},"target":{"id":"ModelEditor","port":"element","setting":{"persist":true}},"metadata":{"title":"BodyEl selection -> element ModelEditor"}},{"source":{"id":"OutputEl","port":"selection"},"target":{"id":"UpdateOutput","port":"element","setting":{"persist":true}},"metadata":{"title":"OutputEl selection -> element UpdateOutput"}},{"source":{"id":"EditorDefaults","port":"out"},"target":{"id":"ModelEditor","port":"options"},"metadata":{"title":"EditorDefaults out -> options ModelEditor"}},{"source":{"id":"ModelEditor","port":"out"},"target":{"id":"Template","port":"vars","setting":{"index":"resume"}},"metadata":{"title":"ModelEditor out -> vars Template"}},{"source":{"id":"Template","port":"out"},"target":{"id":"UpdateOutput","port":"html"},"metadata":{"title":"Template out -> html UpdateOutput"}},{"source":{"id":"BodyEl","port":"error"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"BodyEl error -> msg Log"}},{"source":{"id":"BodyEl","port":"selection"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"BodyEl selection -> msg Log"}},{"source":{"id":"EditorDefaults","port":"out"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"EditorDefaults out -> msg Log"}}],"title":"Test JSON Editor","ns":"json-editor","name":"editor","id":"MyId","providers":{"@":{"url":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}}};
+var map = {"type":"flow","nodes":[{"id":"ResumeEditor","title":"ResumeEditor","ns":"json-editor","name":"editor"},{"id":"EditorEl","title":"EditorEl","ns":"dom","name":"querySelector","context":{"selector":"#form"}},{"id":"OutputEl","title":"OutputEl","ns":"dom","name":"querySelector","context":{"selector":"#output"}},{"id":"UpdateResume","title":"UpdateResume","ns":"dom","name":"setHtml"},{"id":"EditorDefaults","title":"EditorDefaults","ns":"object","name":"create"},{"id":"Log","title":"Log","ns":"console","name":"log"},{"id":"ResumeView","title":"ResumeView","ns":"template","name":"handlebars","context":{"body":"<article>\n\t<header id=\"header\">\n\t\t<div class=\"container\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-9 col-sm-push-3\">\n\t\t\t\t\t{{#resume.basics}}\n\t\t\t\t\t{{#name}}\n\t\t\t\t\t<h1>\n\t\t\t\t\t\t{{.}}\n\t\t\t\t\t</h1>\n\t\t\t\t\t{{/name}}\n\t\t\t\t\t{{#label}}\n\t\t\t\t\t<h2>\n\t\t\t\t\t\t{{.}}\n\t\t\t\t\t</h2>\n\t\t\t\t\t{{/label}}\n\t\t\t\t\t{{/resume.basics}}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</header>\n\n\t<div id=\"content\" class=\"container\">\n\n\t{{#resume.basics}}\n\t<section id=\"contact\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Contact</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#email}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t<strong>Email</strong>\n\t\t\t\t<div class=\"email\">{{.}}</div>\n\t\t\t</div>\n\t\t\t{{/email}}\n\t\t\t{{#phone}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t<strong>Phone</strong>\n\t\t\t\t<div class=\"phone\">{{.}}</div>\n\t\t\t</div>\n\t\t\t{{/phone}}\n\t\t\t{{#website}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t<strong>Website</strong>\n\t\t\t\t<div class=\"website\">\n\t\t\t\t\t<a href=\"{{.}}\">{{.}}</a>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t{{/website}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t<section id=\"about\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>About</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t{{#summary}}\n\t\t\t<p>{{.}}</p>\n\t\t{{/summary}}\n\t\t</div>\n\t</section>\n\t{{#if profiles.length}}\n\t<section id=\"profiles\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Profiles</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t\t{{#profiles}}\n\t\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t\t{{#network}}\n\t\t\t\t\t<strong class=\"network\">\n\t\t\t\t\t\t{{.}}\n\t\t\t\t\t</strong>\n\t\t\t\t\t{{/network}}\n\t\t\t\t\t{{#if username}}\n\t\t\t\t\t<div class=\"username\">\n\t\t\t\t\t\t{{#if url}}\n\t\t\t\t\t\t<div class=\"url\">\n\t\t\t\t\t\t\t<a href=\"{{url}}\">{{username}}</a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t{{else}}\n\t\t\t\t\t\t\t{{username}}\n\t\t\t\t\t\t{{/if}}\n\t\t\t\t\t</div>\n\t\t\t\t\t{{else}}\n\t\t\t\t\t\t{{#if url}}\n\t\t\t\t\t\t<div class=\"url\">\n\t\t\t\t\t\t\t<a href=\"{{url}}\">{{url}}</a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t{{/if}}\n\t\t\t\t\t{{/if}}\n\t\t\t\t</div>\n\t\t\t\t{{/profiles}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\t{{/resume.basics}}\n\n\t{{#if resume.work.length}}\n\t<section id=\"work\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Work</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.work}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{company}}</span>\n\t\t\t\t\t<span class=\"date\">\n\t\t\t\t\t\t{{startDate}} — {{endDate}}\n\t\t\t\t\t</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#website}}\n\t\t\t\t<div class=\"website pull-right\">\n\t\t\t\t\t<a href=\"{{.}}\">{{.}}</a>\n\t\t\t\t</div>\n\t\t\t\t{{/website}}\n\t\t\t\t{{#position}}\n\t\t\t\t<div class=\"position\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/position}}\n\t\t\t\t{{#summary}}\n\t\t\t\t<div class=\"summary\">\n\t\t\t\t\t<p>{{.}}</p>\n\t\t\t\t</div>\n\t\t\t\t{{/summary}}\n\t\t\t\t{{#if highlights.length}}\n\t\t\t\t<h4>Highlights</h4>\n\t\t\t\t<ul class=\"highlights\">\n\t\t\t\t\t{{#highlights}}\n\t\t\t\t\t<li class=\"bullet\">{{.}}</li>\n\t\t\t\t\t{{/highlights}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.volunteer.length}}\n\t<section id=\"volunteer\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Volunteer</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.volunteer}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{organization}}</span>\n\t\t\t\t\t<span class=\"date\">\n\t\t\t\t\t\t{{startDate}} — {{endDate}}\n\t\t\t\t\t</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#website}}\n\t\t\t\t<div class=\"website pull-right\">\n\t\t\t\t\t<a href=\"{{.}}\">{{.}}</a>\n\t\t\t\t</div>\n\t\t\t\t{{/website}}\n\t\t\t\t{{#position}}\n\t\t\t\t<div class=\"position\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/position}}\n\t\t\t\t{{#summary}}\n\t\t\t\t<div class=\"summary\">\n\t\t\t\t\t<p>{{.}}</p>\n\t\t\t\t</div>\n\t\t\t\t{{/summary}}\n\t\t\t\t{{#if highlights.length}}\n\t\t\t\t<h4>Highlights</h4>\n\t\t\t\t<ul class=\"highlights\">\n\t\t\t\t\t{{#highlights}}\n\t\t\t\t\t<li class=\"bullet\">{{.}}</li>\n\t\t\t\t\t{{/highlights}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.education.length}}\n\t<section id=\"education\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Education</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.education}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{institution}}</span>\n\t\t\t\t\t<span class=\"date\">\n\t\t\t\t\t\t{{startDate}} — {{endDate}}\n\t\t\t\t\t</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#area}}\n\t\t\t\t<div class=\"area\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/area}}\n\t\t\t\t{{#studyType}}\n\t\t\t\t<div class=\"studyType\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/studyType}}\n\t\t\t\t{{#if courses.length}}\n\t\t\t\t<h4>Courses</h4>\n\t\t\t\t<ul class=\"courses\">\n\t\t\t\t\t{{#courses}}\n\t\t\t\t\t<li>{{.}}</li>\n\t\t\t\t\t{{/courses}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.awards.length}}\n\t<section id=\"awards\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Awards</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.awards}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{title}}</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#date}}\n\t\t\t\t<div class=\"date pull-right\">\n\t\t\t\t\t<em>Awarded</em>\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/date}}\n\t\t\t\t{{#awarder}}\n\t\t\t\t<div class=\"awarder\">\n\t\t\t\t\t<em>by</em>\n\t\t\t\t\t<strong>{{.}}</strong>\n\t\t\t\t</div>\n\t\t\t\t{{/awarder}}\n\t\t\t\t{{#summary}}\n\t\t\t\t<div class=\"summary\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/summary}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.publications.length}}\n\t<section id=\"publications\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Publications</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.publications}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t<h4 class=\"strike-through\">\n\t\t\t\t\t<span>{{name}}</span>\n\t\t\t\t\t<span class=\"date\">\n\t\t\t\t\t\t{{releaseDate}}\n\t\t\t\t\t</span>\n\t\t\t\t</h4>\n\t\t\t\t{{#website}}\n\t\t\t\t<div class=\"website pull-right\">\n\t\t\t\t\t<a href=\"{{.}}\"></a>\n\t\t\t\t</div>\n\t\t\t\t{{/website}}\n\t\t\t\t{{#publisher}}\n\t\t\t\t<div class=\"publisher\">\n\t\t\t\t\t<em>Published by</em>\n\t\t\t\t\t<strong>{{.}}</strong>\n\t\t\t\t</div>\n\t\t\t\t{{/publisher}}\n\t\t\t\t{{#summary}}\n\t\t\t\t<div class=\"summary\">\n\t\t\t\t\t<p>{{.}}</p>\n\t\t\t\t</div>\n\t\t\t\t{{/summary}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.skills.length}}\n\t<section id=\"skills\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Skills</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.skills}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t{{#name}}\n\t\t\t\t<div class=\"name\">\n\t\t\t\t\t<h4>{{.}}</h4>\n\t\t\t\t</div>\n\t\t\t\t{{/name}}\n\t\t\t\t{{#if keywords.length}}\n\t\t\t\t<ul class=\"keywords\">\n\t\t\t\t\t{{#keywords}}\n\t\t\t\t\t<li>{{.}}</li>\n\t\t\t\t\t{{/keywords}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.languages.length}}\n\t<section id=\"languages\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Languages</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.languages}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t{{#language}}\n\t\t\t\t<div class=\"language\">\n\t\t\t\t\t<strong>{{.}}</strong>\n\t\t\t\t</div>\n\t\t\t\t{{/language}}\n\t\t\t\t{{#fluency}}\n\t\t\t\t<div class=\"fluency\">\n\t\t\t\t\t{{.}}\n\t\t\t\t</div>\n\t\t\t\t{{/fluency}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.interests.length}}\n\t<section id=\"interests\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>Interests</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.interests}}\n\t\t\t<div class=\"col-sm-6\">\n\t\t\t\t{{#name}}\n\t\t\t\t<div class=\"name\">\n\t\t\t\t\t<h4>{{.}}</h4>\n\t\t\t\t</div>\n\t\t\t\t{{/name}}\n\t\t\t\t{{#if keywords.length}}\n\t\t\t\t<ul class=\"keywords\">\n\t\t\t\t\t{{#keywords}}\n\t\t\t\t\t<li>{{.}}</li>\n\t\t\t\t\t{{/keywords}}\n\t\t\t\t</ul>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t{{#if resume.references.length}}\n\t<section id=\"references\" class=\"row\">\n\t\t<aside class=\"col-sm-3\">\n\t\t\t<h3>References</h3>\n\t\t</aside>\n\t\t<div class=\"col-sm-9\">\n\t\t\t<div class=\"row\">\n\t\t\t{{#each resume.references}}\n\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t{{#if reference}}\n\t\t\t\t<blockquote class=\"reference\">\n\t\t\t\t\t<p>{{reference}}</p>\n\t\t\t\t\t{{#name}}\n\t\t\t\t\t<p class=\"name\">\n\t\t\t\t\t\t<strong>— {{.}}</strong>\n\t\t\t\t\t</p>\n\t\t\t\t\t{{/name}}\n\t\t\t\t</blockquote>\n\t\t\t\t{{/if}}\n\t\t\t</div>\n\t\t\t{{/each}}\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t{{/if}}\n\n\t</div>\n</article>\n"}}],"links":[{"source":{"id":"EditorEl","port":"selection"},"target":{"id":"ResumeEditor","port":"element","setting":{"persist":true}},"metadata":{"title":"EditorEl selection -> element ResumeEditor"}},{"source":{"id":"OutputEl","port":"selection"},"target":{"id":"UpdateResume","port":"element","setting":{"persist":true}},"metadata":{"title":"OutputEl selection -> element UpdateResume"}},{"source":{"id":"EditorDefaults","port":"out"},"target":{"id":"ResumeEditor","port":"options"},"metadata":{"title":"EditorDefaults out -> options ResumeEditor"}},{"source":{"id":"ResumeEditor","port":"out"},"target":{"id":"ResumeView","port":"vars","setting":{"index":"resume"}},"metadata":{"title":"ResumeEditor out -> vars ResumeView"}},{"source":{"id":"ResumeView","port":"out"},"target":{"id":"UpdateResume","port":"html"},"metadata":{"title":"ResumeView out -> html UpdateResume"}},{"source":{"id":"EditorEl","port":"error"},"target":{"id":"Log","port":"msg"},"metadata":{"title":"EditorEl error -> msg Log"}}],"title":"Test JSON Editor","ns":"json-editor","name":"editor","id":"MyId","providers":{"@":{"url":"https://serve-chix.rhcloud.com/nodes/{ns}/{name}"}}};
 
 var actor;
 window.Actor = actor = Flow.create(map, loader);
@@ -24936,7 +26355,7 @@ monitor(console, actor);
 function onDeviceReady() {
 actor.run();
 actor.push();
-actor.sendIIPs([{"source":{"id":"MyId","port":":iip"},"target":{"id":"ModelEditor","port":"schema"},"metadata":{"title":"Test JSON Editor :iip -> schema ModelEditor"},"data":{"$schema":"http://json-schema.org/draft-04/schema#","title":"Resume Schema","type":"object","additionalProperties":false,"properties":{"basics":{"type":"object","additionalProperties":false,"format":"grid","properties":{"name":{"type":"string"},"label":{"type":"string","description":"e.g. Web Developer"},"picture":{"type":"string","description":"URL (as per RFC 3986) to a picture in JPEG or PNG format"},"email":{"type":"string","description":"e.g. thomas@gmail.com","format":"email"},"phone":{"type":"string","description":"Phone numbers are stored as strings so use any format you like, e.g. 712-117-2923"},"website":{"type":"string","description":"URL (as per RFC 3986) to your website, e.g. personal homepage","format":"uri"},"summary":{"type":"string","description":"Write a short 2-3 sentence biography about yourself"},"location":{"type":"object","additionalProperties":false,"format":"grid","properties":{"address":{"type":"string","description":"To add multiple address lines, use \n. For example, 1234 Glücklichkeit Straße\nHinterhaus 5. Etage li."},"postalCode":{"type":"string"},"city":{"type":"string"},"countryCode":{"type":"string","description":"code as per ISO-3166-1 ALPHA-2, e.g. US, AU, IN"},"region":{"type":"string","description":"The general region where you live. Can be a US state, or a province, for instance."}}},"profiles":{"type":"array","description":"Specify any number of social networks that you participate in","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"network":{"type":"string","description":"e.g. Facebook or Twitter"},"username":{"type":"string","description":"e.g. neutralthoughts"},"url":{"type":"string","description":"e.g. http://twitter.com/neutralthoughts"}}}}}},"work":{"type":"array","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"company":{"type":"string","description":"e.g. Facebook"},"position":{"type":"string","description":"e.g. Software Engineer"},"website":{"type":"string","description":"e.g. http://facebook.com","format":"uri"},"startDate":{"type":"string","description":"resume.json uses the ISO 8601 date standard e.g. 2014-06-29","format":"date"},"endDate":{"type":"string","description":"e.g. 2012-06-29","format":"date"},"summary":{"type":"string","description":"Give an overview of your responsibilities at the company"},"highlights":{"type":"array","description":"Specify multiple accomplishments","additionalItems":false,"items":{"type":"string","description":"e.g. Increased profits by 20% from 2011-2012 through viral advertising"}}}}},"volunteer":{"type":"array","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"organization":{"type":"string","description":"e.g. Facebook"},"position":{"type":"string","description":"e.g. Software Engineer"},"website":{"type":"string","description":"e.g. http://facebook.com","format":"uri"},"startDate":{"type":"string","description":"resume.json uses the ISO 8601 date standard e.g. 2014-06-29","format":"date"},"endDate":{"type":"string","description":"e.g. 2012-06-29","format":"date"},"summary":{"type":"string","description":"Give an overview of your responsibilities at the company"},"highlights":{"type":"array","description":"Specify multiple accomplishments","additionalItems":false,"items":{"type":"string","description":"e.g. Increased profits by 20% from 2011-2012 through viral advertising"}}}}},"education":{"type":"array","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"institution":{"type":"string","description":"e.g. Massachusetts Institute of Technology"},"area":{"type":"string","description":"e.g. Arts"},"studyType":{"type":"string","description":"e.g. Bachelor"},"startDate":{"type":"string","description":"e.g. 2014-06-29","format":"date"},"endDate":{"type":"string","description":"e.g. 2012-06-29","format":"date"},"gpa":{"type":"string","description":"grade point average, e.g. 3.67/4.0"},"courses":{"type":"array","description":"List notable courses/subjects","additionalItems":false,"items":{"type":"string","description":"e.g. H1302 - Introduction to American history"}}}}},"awards":{"type":"array","description":"Specify any awards you have received throughout your professional career","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"title":{"type":"string","description":"e.g. One of the 100 greatest minds of the century"},"date":{"type":"string","description":"e.g. 1989-06-12","format":"date"},"awarder":{"type":"string","description":"e.g. Time Magazine"},"summary":{"type":"string","description":"e.g. Received for my work with Quantum Physics"}}}},"publications":{"type":"array","description":"Specify your publications through your career","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string","description":"e.g. The World Wide Web"},"publisher":{"type":"string","description":"e.g. IEEE, Computer Magazine"},"releaseDate":{"type":"string","description":"e.g. 1990-08-01"},"website":{"type":"string","description":"e.g. http://www.computer.org/csdl/mags/co/1996/10/rx069-abs.html"},"summary":{"type":"string","description":"Short summary of publication. e.g. Discussion of the World Wide Web, HTTP, HTML."}}}},"skills":{"type":"array","description":"List out your professional skill-set","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string","description":"e.g. Web Development"},"level":{"type":"string","description":"e.g. Master"},"keywords":{"type":"array","description":"List some keywords pertaining to this skill","additionalItems":false,"items":{"type":"string","description":"e.g. HTML"}}}}},"languages":{"type":"array","description":"List any other languages you speak","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"language":{"type":"string","description":"e.g. English, Spanish"},"fluency":{"type":"string","description":"e.g. Fluent, Beginner"}}}},"interests":{"type":"array","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string","description":"e.g. Philosophy"},"keywords":{"type":"array","additionalItems":false,"items":{"type":"string","description":"e.g. Friedrich Nietzsche"}}}}},"references":{"type":"array","description":"List references you have received","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string","description":"e.g. Timothy Cook"},"reference":{"type":"string","description":"e.g. Joe blogs was a great employee, who turned up to work at least once a week. He exceeded my expectations when it came to doing nothing."}}}}}}},{"source":{"id":"MyId","port":":iip"},"target":{"id":"ModelEditor","port":"in","setting":{"persist":true}},"metadata":{"title":"Test JSON Editor :iip -> in ModelEditor"},"data":{"label":"Web Developer"}},{"source":{"id":"MyId","port":":iip"},"target":{"id":"EditorDefaults","port":"in"},"metadata":{"title":"Test JSON Editor :iip -> in EditorDefaults"},"data":{"theme":"bootstrap3","disable_edit_json":true,"disable_collapse":true,"disable_properties":true}}]);
+actor.sendIIPs([{"source":{"id":"MyId","port":":iip"},"target":{"id":"ResumeEditor","port":"schema"},"metadata":{"title":"Test JSON Editor :iip -> schema ResumeEditor"},"data":{"$schema":"http://json-schema.org/draft-04/schema#","title":"Resume Schema","type":"object","additionalProperties":false,"properties":{"basics":{"type":"object","additionalProperties":false,"format":"grid","properties":{"name":{"type":"string"},"label":{"type":"string","description":"e.g. Web Developer"},"picture":{"type":"string","description":"URL (as per RFC 3986) to a picture in JPEG or PNG format"},"email":{"type":"string","description":"e.g. thomas@gmail.com","format":"email"},"phone":{"type":"string","description":"Phone numbers are stored as strings so use any format you like, e.g. 712-117-2923"},"website":{"type":"string","description":"URL (as per RFC 3986) to your website, e.g. personal homepage","format":"uri"},"summary":{"type":"string","description":"Write a short 2-3 sentence biography about yourself"},"location":{"type":"object","additionalProperties":false,"format":"grid","properties":{"address":{"type":"string","description":"To add multiple address lines, use \n. For example, 1234 Glücklichkeit Straße\nHinterhaus 5. Etage li."},"postalCode":{"type":"string"},"city":{"type":"string"},"countryCode":{"type":"string","description":"code as per ISO-3166-1 ALPHA-2, e.g. US, AU, IN"},"region":{"type":"string","description":"The general region where you live. Can be a US state, or a province, for instance."}}},"profiles":{"type":"array","description":"Specify any number of social networks that you participate in","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"network":{"type":"string","description":"e.g. Facebook or Twitter"},"username":{"type":"string","description":"e.g. neutralthoughts"},"url":{"type":"string","description":"e.g. http://twitter.com/neutralthoughts"}}}}}},"work":{"type":"array","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"company":{"type":"string","description":"e.g. Facebook"},"position":{"type":"string","description":"e.g. Software Engineer"},"website":{"type":"string","description":"e.g. http://facebook.com","format":"uri"},"startDate":{"type":"string","description":"resume.json uses the ISO 8601 date standard e.g. 2014-06-29","format":"date"},"endDate":{"type":"string","description":"e.g. 2012-06-29","format":"date"},"summary":{"type":"string","description":"Give an overview of your responsibilities at the company"},"highlights":{"type":"array","description":"Specify multiple accomplishments","additionalItems":false,"items":{"type":"string","description":"e.g. Increased profits by 20% from 2011-2012 through viral advertising"}}}}},"volunteer":{"type":"array","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"organization":{"type":"string","description":"e.g. Facebook"},"position":{"type":"string","description":"e.g. Software Engineer"},"website":{"type":"string","description":"e.g. http://facebook.com","format":"uri"},"startDate":{"type":"string","description":"resume.json uses the ISO 8601 date standard e.g. 2014-06-29","format":"date"},"endDate":{"type":"string","description":"e.g. 2012-06-29","format":"date"},"summary":{"type":"string","description":"Give an overview of your responsibilities at the company"},"highlights":{"type":"array","description":"Specify multiple accomplishments","additionalItems":false,"items":{"type":"string","description":"e.g. Increased profits by 20% from 2011-2012 through viral advertising"}}}}},"education":{"type":"array","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"institution":{"type":"string","description":"e.g. Massachusetts Institute of Technology"},"area":{"type":"string","description":"e.g. Arts"},"studyType":{"type":"string","description":"e.g. Bachelor"},"startDate":{"type":"string","description":"e.g. 2014-06-29","format":"date"},"endDate":{"type":"string","description":"e.g. 2012-06-29","format":"date"},"gpa":{"type":"string","description":"grade point average, e.g. 3.67/4.0"},"courses":{"type":"array","description":"List notable courses/subjects","additionalItems":false,"items":{"type":"string","description":"e.g. H1302 - Introduction to American history"}}}}},"awards":{"type":"array","description":"Specify any awards you have received throughout your professional career","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"title":{"type":"string","description":"e.g. One of the 100 greatest minds of the century"},"date":{"type":"string","description":"e.g. 1989-06-12","format":"date"},"awarder":{"type":"string","description":"e.g. Time Magazine"},"summary":{"type":"string","description":"e.g. Received for my work with Quantum Physics"}}}},"publications":{"type":"array","description":"Specify your publications through your career","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string","description":"e.g. The World Wide Web"},"publisher":{"type":"string","description":"e.g. IEEE, Computer Magazine"},"releaseDate":{"type":"string","description":"e.g. 1990-08-01"},"website":{"type":"string","description":"e.g. http://www.computer.org/csdl/mags/co/1996/10/rx069-abs.html"},"summary":{"type":"string","description":"Short summary of publication. e.g. Discussion of the World Wide Web, HTTP, HTML."}}}},"skills":{"type":"array","description":"List out your professional skill-set","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string","description":"e.g. Web Development"},"level":{"type":"string","description":"e.g. Master"},"keywords":{"type":"array","description":"List some keywords pertaining to this skill","additionalItems":false,"items":{"type":"string","description":"e.g. HTML"}}}}},"languages":{"type":"array","description":"List any other languages you speak","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"language":{"type":"string","description":"e.g. English, Spanish"},"fluency":{"type":"string","description":"e.g. Fluent, Beginner"}}}},"interests":{"type":"array","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string","description":"e.g. Philosophy"},"keywords":{"type":"array","additionalItems":false,"items":{"type":"string","description":"e.g. Friedrich Nietzsche"}}}}},"references":{"type":"array","description":"List references you have received","additionalItems":false,"items":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string","description":"e.g. Timothy Cook"},"reference":{"type":"string","description":"e.g. Joe blogs was a great employee, who turned up to work at least once a week. He exceeded my expectations when it came to doing nothing."}}}}}}},{"source":{"id":"MyId","port":":iip"},"target":{"id":"ResumeEditor","port":"in","setting":{"persist":true}},"metadata":{"title":"Test JSON Editor :iip -> in ResumeEditor"},"data":{"label":"Web Developer"}},{"source":{"id":"MyId","port":":iip"},"target":{"id":"EditorDefaults","port":"in"},"metadata":{"title":"Test JSON Editor :iip -> in EditorDefaults"},"data":{"theme":"bootstrap3","disable_edit_json":true,"disable_collapse":true,"disable_properties":true}}]);
 
 };
 

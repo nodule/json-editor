@@ -19,6 +19,14 @@ ResumeView(template/handlebars)
 
 './views/resume.template' ~> @body ResumeView
 
+# Need to fix extend
+# Extend(object/extend)
+#{
+#  "resume": {
+#    "title": "Resume Builder"
+#  }
+#} -> [0] ^source Extend
+
 # There is still a bug somewhere, has to do with who is first.
 {
   "label": "Web Developer"
@@ -34,6 +42,8 @@ ResumeView(template/handlebars)
 EditorDefaults out -> options ResumeEditor
 
 ResumeEditor out -> [resume] vars ResumeView
+#ResumeEditor out -> in Extend
+#Extend out -> [resume] vars ResumeView
 ResumeView out -> html UpdateResume
 
 EditorEl error -> msg Log
