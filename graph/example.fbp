@@ -10,7 +10,7 @@ OutputEl(dom/querySelector)
 UpdateOutput(dom/setHtml)
 EditorDefaults(object/create)
 Log(console/log)
-Mustache(template/mustache)
+Template(template/handlebars)
 
 '#form'   -> @selector BodyEl selection -> ^element ModelEditor
 '#output' -> @selector OutputEl selection -> ^element UpdateOutput
@@ -18,7 +18,7 @@ Mustache(template/mustache)
 # include and parse the json
 './schemas/resume.json!' ~> schema ModelEditor
 
-'./views/resume.template' ~> @body Mustache
+'./views/resume.template' ~> @body Template
 
 {
   "name": "Hey!"
@@ -40,13 +40,14 @@ Mustache(template/mustache)
 EditorDefaults out -> options ModelEditor
 
 ModelEditor out -> msg Log
-ModelEditor out -> vars Mustache
+ModelEditor out -> [resume] vars Template
 
-Mustache out -> html UpdateOutput
+Template out -> html UpdateOutput
 
 # Update element.
-#Mustache out ->
+#Template out ->
 
 BodyEl error -> msg Log
+Template out -> msg Log
 BodyEl selection -> msg Log
 EditorDefaults out -> msg Log
