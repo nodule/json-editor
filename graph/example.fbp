@@ -3,32 +3,26 @@ ns: json-editor
 name: editor
 id: MyId
 
-ModelEditor(json-editor/editor)
-ModelEditor(json-editor/editor)
-BodyEl(dom/querySelector)
+ResumeEditor(json-editor/editor)
+EditorEl(dom/querySelector)
 OutputEl(dom/querySelector)
-UpdateOutput(dom/setHtml)
+UpdateResume(dom/setHtml)
 EditorDefaults(object/create)
 Log(console/log)
-Template(template/handlebars)
+ResumeView(template/handlebars)
 
-'#form'   -> @selector BodyEl selection -> ^element ModelEditor
-'#output' -> @selector OutputEl selection -> ^element UpdateOutput
+'#form'   -> @selector EditorEl selection -> ^element ResumeEditor
+'#output' -> @selector OutputEl selection -> ^element UpdateResume
 
 # include and parse the json
-'./schemas/resume.json!' ~> schema ModelEditor
+'./schemas/resume.json!' ~> schema ResumeEditor
 
-'./views/resume.template' ~> @body Template
-
-{
-  "name": "Hey!"
-} -> ^in ModelEditor
-
-# trying to get it started
-# is async broke and always returning false maybe?
-#{} -> @options ModelEditor
+'./views/resume.template' ~> @body ResumeView
 
 # There is still a bug somewhere, has to do with who is first.
+{
+  "label": "Web Developer"
+} -> ^in ResumeEditor
 
 {
   "theme": "bootstrap3",
@@ -37,11 +31,9 @@ Template(template/handlebars)
   "disable_properties": true
 } -> in EditorDefaults
 
-EditorDefaults out -> options ModelEditor
+EditorDefaults out -> options ResumeEditor
 
-ModelEditor out -> [resume] vars Template
-Template out -> html UpdateOutput
+ResumeEditor out -> [resume] vars ResumeView
+ResumeView out -> html UpdateResume
 
-BodyEl error -> msg Log
-BodyEl selection -> msg Log
-EditorDefaults out -> msg Log
+EditorEl error -> msg Log
