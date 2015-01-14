@@ -6,16 +6,22 @@ id: MyId
 ModelEditor(json-editor/editor)
 ModelEditor(json-editor/editor)
 BodyEl(dom/querySelector)
+OutputEl(dom/querySelector)
+UpdateOutput(dom/setHtml)
 EditorDefaults(object/create)
 Log(console/log)
+Mustache(template/mustache)
 
-'body' -> @selector BodyEl selection -> ^element ModelEditor
+'#form'   -> @selector BodyEl selection -> ^element ModelEditor
+'#output' -> @selector OutputEl selection -> ^element UpdateOutput
 
 # include and parse the json
-'./schemas/model.json!' ~> schema ModelEditor
+'./schemas/resume.json!' ~> schema ModelEditor
+
+'./views/resume.template' ~> @body Mustache
 
 {
-  "title": "Hey!"
+  "name": "Hey!"
 } -> ^in ModelEditor
 
 # trying to get it started
@@ -34,6 +40,12 @@ Log(console/log)
 EditorDefaults out -> options ModelEditor
 
 ModelEditor out -> msg Log
+ModelEditor out -> vars Mustache
+
+Mustache out -> html UpdateOutput
+
+# Update element.
+#Mustache out ->
 
 BodyEl error -> msg Log
 BodyEl selection -> msg Log
