@@ -39,15 +39,9 @@ Template(template/handlebars)
 
 EditorDefaults out -> options ModelEditor
 
-ModelEditor out -> msg Log
 ModelEditor out -> [resume] vars Template
-
 Template out -> html UpdateOutput
 
-# Update element.
-#Template out ->
-
 BodyEl error -> msg Log
-Template out -> msg Log
 BodyEl selection -> msg Log
 EditorDefaults out -> msg Log
