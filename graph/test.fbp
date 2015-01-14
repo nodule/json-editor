@@ -1,31 +1,40 @@
 title: Test JSON Editor
 ns: json-editor
 name: editor
+id: MyId
 
-JSONEditor(json-editor/editor)
+ModelEditor(json-editor/editor)
+ModelEditor(json-editor/editor)
 BodyEl(dom/querySelector)
+EditorDefaults(object/create)
 Log(console/log)
 
-# sending as IIP seems to be broken :/
-'body' -> @selector BodyEl selection -> ^element JSONEditor
-{
-  "type": "object",
-  "properties": {
-    "title": {
-      "title": "Title",
-      "type": "string"
-    }
-  }
-} -> schema JSONEditor
+'body' -> @selector BodyEl selection -> ^element ModelEditor
+
+# include and parse the json
+'./schemas/model.json!' ~> schema ModelEditor
 
 {
   "title": "Hey!"
-} -> in JSONEditor
+} -> ^in ModelEditor
 
 # trying to get it started
 # is async broke and always returning false maybe?
-{} -> @options JSONEditor
+#{} -> @options ModelEditor
 
-JSONEditor out -> msg Log
+# There is still a bug somewhere, has to do with who is first.
+
+{
+  "theme": "bootstrap3",
+  "disable_edit_json": true,
+  "disable_collapse": true,
+  "disable_properties": true
+} -> in EditorDefaults
+
+EditorDefaults out -> options ModelEditor
+
+ModelEditor out -> msg Log
+
 BodyEl error -> msg Log
 BodyEl selection -> msg Log
+EditorDefaults out -> msg Log

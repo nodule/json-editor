@@ -15,7 +15,7 @@
     "test": "chit -r"
   },
   "dependencies": {
-    "json-editor": "^0.7.13"
+    "json-editor": "git://github.com/psichi/json-editor"
   },
   "devDependencies": {
     "chit": "0.x.x",
