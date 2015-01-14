@@ -14,7 +14,7 @@ The example uses a schema's from the [JSON Resume](https://github.com/jsonresume
 
 Graph:
 
-![JSON Editor Example](https://raw.githubusercontent.com/nodule/json-editor/master/graphs/example.png)
+![JSON Editor Example](https://raw.githubusercontent.com/nodule/json-editor/master/graph/example.png)
 
 Can be generated using:
 
