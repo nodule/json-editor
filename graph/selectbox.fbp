@@ -34,15 +34,14 @@ Log(console/log)
 './protocol/network.json!'   ~> in NetworkSchema(object/create)
 './protocol/runtime.json!'   ~> in RuntimeSchema(object/create)
 
-# somehow also here it would be much nicer if I could do
+# somehow also here it would be much nicer if I could do:
+# SelectProtocol out [graph] ->
+# SelectProtocol out [network] ->
 # it takes away much conversion etc.
 # Because now something goes out and I have to determine what it is.
 # although it's already known.
 # I think this is also pretty specific to a selectbox, which kinda
 # behaves the same as a router.
-
-# SelectProtocol out [graph] ->
-# SelectProtocol out [network] ->
 
 # include and parse the json
 # './schemas/protocol.json!'  ~> schema ResumeEditor
