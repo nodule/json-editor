@@ -1,0 +1,52 @@
+title: Protocol Selectbox
+ns: json-editor
+name: protocol
+id: MyProtocol
+
+ProtocolEl(dom/querySelector)
+CommandEl(dom/querySelector)
+
+SelectProtocol(bootstrap/select)
+SelectCommand(bootstrap/select)
+
+Log(console/log)
+
+'#protocol' -> @selector ProtocolEl selection -> ^element SelectProtocol
+'#command'  -> @selector CommandEl selection -> ^element SelectCommand
+'Protocol' -> @label SelectProtocol
+
+[
+  { "label": "Graph", "value": "graph" },
+  { "label": "Network", "value": "network" },
+  { "label": "Runtime", "value": "runtime" },
+  { "label": "Component", "value": "component" }
+] -> @options SelectProtocol
+
+[
+  { "label": "Graph", "value": "graph" },
+  { "label": "Network", "value": "network" },
+  { "label": "Runtime", "value": "runtime" },
+  { "label": "Component", "value": "component" }
+] -> @options SelectCommand
+
+'./protocol/graph.json!'     ~> in GraphSchema(object/create)
+'./protocol/component.json!' ~> in ComponentSchema(object/create)
+'./protocol/network.json!'   ~> in NetworkSchema(object/create)
+'./protocol/runtime.json!'   ~> in RuntimeSchema(object/create)
+
+# somehow also here it would be much nicer if I could do
+# it takes away much conversion etc.
+# Because now something goes out and I have to determine what it is.
+# although it's already known.
+# I think this is also pretty specific to a selectbox, which kinda
+# behaves the same as a router.
+
+# SelectProtocol out [graph] ->
+# SelectProtocol out [network] ->
+
+# include and parse the json
+# './schemas/protocol.json!'  ~> schema ResumeEditor
+
+SelectProtocol element -> msg Log
+SelectProtocol out -> msg Log
+SelectCommand out -> msg Log

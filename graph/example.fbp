@@ -15,9 +15,9 @@ ResumeView(template/handlebars)
 '#output' -> @selector OutputEl selection -> ^element UpdateResume
 
 # include and parse the json
-'./schemas/resume.json!' ~> schema ResumeEditor
-
-'./views/resume.template' ~> @body ResumeView
+'./schemas/resume.json!'  ~> schema ResumeEditor
+'./views/resume.template' ~>  @body ResumeView
+"./defaults.json!"         ~>     in EditorDefaults
 
 # Need to fix extend
 # Extend(object/extend)
@@ -31,13 +31,6 @@ ResumeView(template/handlebars)
 {
   "label": "Web Developer"
 } -> ^in ResumeEditor
-
-{
-  "theme": "bootstrap3",
-  "disable_edit_json": true,
-  "disable_collapse": true,
-  "disable_properties": true
-} -> in EditorDefaults
 
 EditorDefaults out -> options ResumeEditor
 

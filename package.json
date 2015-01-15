@@ -15,7 +15,8 @@
     "test": "chit -r"
   },
   "dependencies": {
-    "json-editor": "git://github.com/psichi/json-editor"
+    "json-editor": "git://github.com/psichi/json-editor",
+    "select2": "^3.5.1-browserify-fix"
   },
   "devDependencies": {
     "chit": "0.x.x",
