@@ -1,0 +1,33 @@
+title: Modelling
+ns: models
+name: model
+id: MyModel
+
+Commands(object/keys)
+ProtocolSchemas(object/create)
+Log(console/log)
+
+# needs start && path
+
+'./graph/protocol/all.json!' ~> @in ProtocolSchemas
+
+-> path Commands
+-> in:start Dummy(utils/dummy)
+
+Dummy out -> :start Commands
+
+ProtocolSchemas out -> ^in Commands out -> msg Log
+
+(
+ return {
+   label: val,
+   value: val
+ }
+) -> @fn PrepareCommand(array/map)
+
+Commands out -> in PrepareCommand
+
+# send options out
+<- out:options PrepareCommand
+# Send graph commands out
+<- out:commands Commands
