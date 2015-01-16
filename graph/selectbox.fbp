@@ -3,34 +3,28 @@ ns: json-editor
 name: protocol
 id: MyProtocol
 
-ProtocolEl(dom/querySelector)
-CommandEl(dom/querySelector)
+Log(console/log)
+ProtocolEl(dom/querySelector), CommandEl(dom/querySelector)
+SelectProtocol(bootstrap/select), SelectCommand(bootstrap/select)
+ClearCommands(dom/setHtml)
 
-SelectProtocol(bootstrap/select)
-SelectCommand(bootstrap/select)
-
-# still a bit weird
-# test these paths relative should always work.
+# TODO: relative paths should always work.
 provider ./graph/{ns}/{name}.fbp as x
 
-#GraphCommands(object/keys)
 GraphCommands(x:models/model)
-NetworkCommands(object/keys)
-RuntimeCommands(object/keys)
-ComponentCommands(object/keys)
-
-# -> start GraphCommands
-# -> path GraphCommands
-# GraphCommands options
-# GraphCommands commands
-
-Log(console/log)
+NetworkCommands(x:models/model)
+RuntimeCommands(x:models/model)
+ComponentCommands(x:models/model)
 
 '#protocol' -> @selector ProtocolEl selection -> ^element SelectProtocol
 '#command'  -> @selector CommandEl selection -> ^element SelectCommand
-'Protocol' -> @label SelectProtocol
+'Protocol'  -> @label SelectProtocol
+
+'' -> @html ClearCommands
+CommandEl selection -> ^element ClearCommands
 
 [
+  { "label": "Select..", "value": "clear" },
   { "label": "Graph", "value": "graph" },
   { "label": "Network", "value": "network" },
   { "label": "Runtime", "value": "runtime" },
@@ -39,20 +33,10 @@ Log(console/log)
 
 './protocol/all.json!' ~> in ProtocolSchemas(object/create)
 
-# ok, should be a subgraph, throwing out keys and
-# the full selection. You could say that's the model dir.
-# maybe.. yeah receives input and throws stuff out.
-
-# sender should decide persist I think, check that..
-#'graph.input'       -> ^path GraphCommands
 'graph.input'       -> ^path GraphCommands
-'component.input'   -> @path ComponentCommands
-'network.input'     -> @path NetworkCommands
-'runtime.input'     -> @path RuntimeCommands
-#ProtocolSchemas out -> ^in GraphCommands out     -> msg Log
-ProtocolSchemas out -> ^in ComponentCommands out -> msg Log
-ProtocolSchemas out -> ^in NetworkCommands out   -> msg Log
-ProtocolSchemas out -> ^in RuntimeCommands out   -> msg Log
+'component.input'   -> ^path ComponentCommands
+'network.input'     -> ^path NetworkCommands
+'runtime.input'     -> ^path RuntimeCommands
 
 (
  return {
@@ -61,23 +45,15 @@ ProtocolSchemas out -> ^in RuntimeCommands out   -> msg Log
  }
 ) -> @fn PrepareCommand(array/map)
 
-#SelectProtocol out [graph]     -> :start GraphCommands
 SelectProtocol out [graph]     -> start GraphCommands
-SelectProtocol out [component] -> :start ComponentCommands
-SelectProtocol out [network]   -> :start NetworkCommands
-SelectProtocol out [runtime]   -> :start RuntimeCommands
+SelectProtocol out [component] -> start ComponentCommands
+SelectProtocol out [network]   -> start NetworkCommands
+SelectProtocol out [runtime]   -> start RuntimeCommands
+SelectProtocol out [clear]     -> :start ClearCommands
 
-#GraphCommands out     -> in PrepareCommand
-NetworkCommands out   -> in PrepareCommand
-ComponentCommands out -> in PrepareCommand
-RuntimeCommands out   -> in PrepareCommand
+GraphCommands options     -> options SelectCommand
+NetworkCommands options   -> options SelectCommand
+ComponentCommands options -> options SelectCommand
+RuntimeCommands options   -> options SelectCommand
 
-PrepareCommand out -> options SelectCommand
-
-# Ok, now see if graph commands still work.
-GraphCommands options -> options SelectCommand
-
-#
-GraphCommands commands -> msg Log
-GraphCommands options -> msg Log
 SelectCommand out -> msg Log
