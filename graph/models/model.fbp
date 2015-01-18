@@ -3,20 +3,25 @@ ns: models
 name: model
 id: MyModel
 
-Commands(object/keys)
+Commands(object/keys), CommandsPicker(data/pick)
 ProtocolSchemas(object/create)
 Log(console/log)
 
-# needs start && path
-
+# fbpx graph && fbpx run seem to expect different paths
 './graph/protocol/all.json!' ~> @in ProtocolSchemas
+#'../protocol/all.json!' ~> @in ProtocolSchemas
 
--> path Commands
--> in:start Dummy(utils/dummy)
+-> in:command CommandKey(object/keys)
+-> in GetCommands(object/keys)
 
-Dummy out -> :start Commands
+'.input' -> @append BuildPath(string/append)
 
-ProtocolSchemas out -> ^in Commands out -> msg Log
+GetCommands out [0] -> in BuildPath out -> path CommandsPicker
+
+CommandsPicker out -> msg Log
+BuildPath out -> msg Log
+
+ProtocolSchemas out -> ^in CommandsPicker out -> in Commands out -> msg Log
 
 (
  return {
@@ -26,8 +31,11 @@ ProtocolSchemas out -> ^in Commands out -> msg Log
 ) -> @fn PrepareCommand(array/map)
 
 Commands out -> in PrepareCommand
+CommandsPicker out -> msg Log
 
-# send options out
+CommandsPicker out -> ^in PickSchema
+CommandKey out [0] -> path PickSchema(data/pick)
+CommandKey out -> msg Log
+
+<- out:schema PickSchema
 <- out:options PrepareCommand
-# Send graph commands out
-<- out:commands Commands

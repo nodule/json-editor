@@ -5,23 +5,32 @@ id: MyProtocol
 
 Log(console/log)
 ProtocolEl(dom/querySelector), CommandEl(dom/querySelector)
+EditorEl(dom/querySelector)
+
 SelectProtocol(bootstrap/select), SelectCommand(bootstrap/select)
 ClearCommands(dom/setHtml)
+ClearEditor(dom/setHtml)
+
+CommandEditor(json-editor/editor)
 
 # TODO: relative paths should always work.
 provider ./graph/{ns}/{name}.fbp as x
 
 GraphCommands(x:models/model)
-NetworkCommands(x:models/model)
-RuntimeCommands(x:models/model)
-ComponentCommands(x:models/model)
 
-'#protocol' -> @selector ProtocolEl selection -> ^element SelectProtocol
+# rule (for now): persist never starts
+'#protocol' -> @selector ProtocolEl selection -> element SelectProtocol
 '#command'  -> @selector CommandEl selection -> ^element SelectCommand
+'#editor'   -> @selector EditorEl selection -> ^element CommandEditor
 'Protocol'  -> @label SelectProtocol
 
+"./defaults.json!" ~> @options CommandEditor
+
 '' -> @html ClearCommands
+'' -> @html ClearEditor
+
 CommandEl selection -> ^element ClearCommands
+EditorEl selection -> ^element ClearEditor
 
 [
   { "label": "Select..", "value": "clear" },
@@ -31,29 +40,11 @@ CommandEl selection -> ^element ClearCommands
   { "label": "Component", "value": "component" }
 ] -> @options SelectProtocol
 
-'./protocol/all.json!' ~> in ProtocolSchemas(object/create)
-
-'graph.input'       -> ^path GraphCommands
-'component.input'   -> ^path ComponentCommands
-'network.input'     -> ^path NetworkCommands
-'runtime.input'     -> ^path RuntimeCommands
-
-(
- return {
-   label: val,
-   value: val
- }
-) -> @fn PrepareCommand(array/map)
-
-SelectProtocol out [graph]     -> start GraphCommands
-SelectProtocol out [component] -> start ComponentCommands
-SelectProtocol out [network]   -> start NetworkCommands
-SelectProtocol out [runtime]   -> start RuntimeCommands
-SelectProtocol out [clear]     -> :start ClearCommands
-
+SelectProtocol out -> in GraphCommands
+SelectProtocol out [clear] -> :start ClearCommands
+SelectProtocol out -> :start ClearEditor
 GraphCommands options     -> options SelectCommand
-NetworkCommands options   -> options SelectCommand
-ComponentCommands options -> options SelectCommand
-RuntimeCommands options   -> options SelectCommand
 
-SelectCommand out -> msg Log
+SelectCommand out -> command GraphCommands
+GraphCommands schema -> schema CommandEditor
+GraphCommands schema -> msg Log

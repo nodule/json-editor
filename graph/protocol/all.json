@@ -4,50 +4,64 @@
     "description": "Protocol for starting and stopping FBP networks, and finding out about their state.",
     "output": {
       "stopped": {
+        "title": "Stopped",
         "description": "Inform that a given network has stopped.",
+        "type": "object",
         "properties": {
           "time": {
+            "title": "Time",
             "type": "string",
             "format": "date-time",
             "description": "time when the network was stopped"
           },
           "uptime": {
+            "title": "Uptime",
             "type": "string",
             "format": "date-time",
             "description": "time the network was running, in seconds"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "started": {
+        "title": "Started",
         "description": "Inform that a given network has been started.",
+        "type": "object",
         "properties": {
           "time": {
+            "title": "Time",
             "type": "string",
             "format": "date-time",
             "description": "time when the network was started"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "status": {
+        "title": "Status",
         "description": "Response to a getstatus message.",
+        "type": "object",
         "properties": {
           "running": {
+            "title": "Running",
             "type": "boolean",
             "description": "boolean tells whether the network is running or not"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           },
           "uptime": {
+            "title": "Uptime",
             "type": "string",
             "format": "date-time",
             "description": "(optional) time the network has been running, in seconds"
@@ -417,52 +431,67 @@
         "description": "Component error"
       },
       "component": {
+        "title": "Component",
         "description": "Transmit the metadata about a component instance.",
+        "type": "object",
         "properties": {
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "component name in format that can be used in graphs"
           },
           "description": {
+            "title": "Description",
             "type": "string",
             "description": "(optional) textual description on what the component does"
           },
           "icon": {
+            "title": "Icon",
             "type": "string",
             "description": "(optional): visual icon for the component, matching icon names in [Font Awesome](http://fortawesome.github.io/Font-Awesome/icons/)"
           },
           "subgraph": {
+            "title": "Subgraph",
             "type": "boolean",
             "description": "boolean telling whether the component is a subgraph"
           },
           "inPorts": {
+            "title": "Input Ports",
             "description": "list of input ports, each containing:",
+            "type": "object",
             "properties": {
               "id": {
+                "title": "ID",
                 "type": "string",
                 "description": "port name"
               },
               "type": {
+                "title": "Type",
                 "type": "string",
                 "description": "port datatype, for example `boolean`"
               },
               "description": {
+                "title": "Description",
                 "type": "string",
                 "description": "textual description of the port"
               },
               "addressable": {
+                "title": "Addressable",
                 "type": "boolean",
                 "description": "boolean telling whether the port is an ArrayPort"
               },
               "required": {
+                "title": "Required",
                 "type": "boolean",
                 "description": "boolean telling whether the port needs to be connected for the component to work"
               },
               "values": {
+                "title": "Values",
                 "type": "array",
                 "description": "(optional) array of the values that the port accepts for enum ports"
               },
               "default": {
+                "title": "Default",
                 "type": "any",
                 "description": "(optional) the default value received by the port"
               }
@@ -470,24 +499,30 @@
           },
           "outPorts": {
             "description": "list of output ports",
+            "type": "object",
             "properties": {
               "id": {
+                "title": "ID",
                 "type": "string",
                 "description": "port name"
               },
               "type": {
+                "title": "Type",
                 "type": "string",
                 "description": "port datatype, for example `boolean`"
               },
               "description": {
+                "title": "Description",
                 "type": "string",
                 "description": "textual description of the port"
               },
               "addressable": {
+                "title": "Addressable",
                 "type": "boolean",
                 "description": "boolean telling whether the port is an ArrayPort"
               },
               "required": {
+                "title": "Required",
                 "type": "boolean",
                 "description": "boolean telling whether the port needs to be connected for the component to work"
               }
@@ -497,24 +532,30 @@
       },
       "source": {
         "description": "Source code for a component. In cases where a runtime receives a `source` message, it should do whatever operations are needed for making that component available for graphs, including possible compilation.",
+        "type": "object",
         "properties": {
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "Name of the component"
           },
           "language": {
+            "title": "Language",
             "type": "string",
             "description": "The programming language used for the component code, for example `coffeescript`"
           },
           "library": {
+            "title": "Library",
             "type": "string",
             "description": "(optional) Component library identifier"
           },
           "code": {
+            "title": "Code",
             "type": "string",
             "description": "Component source code"
           },
           "tests": {
+            "title": "Tests",
             "type": "string",
             "description": "(optional) unit tests for the component"
           }
@@ -523,13 +564,19 @@
     },
     "input": {
       "error": {
-        "description": "Component error"
+        "title": "Error",
+        "description": "Component error",
+        "type": "object"
       },
       "list": {
-        "description": "Request a list of currently available components. Will be responded with a set of `component` messages."
+        "title": "List",
+        "description": "Request a list of currently available components. Will be responded with a set of `component` messages.",
+        "type": "object"
       },
       "getsource": {
+        "title": "Get Source",
         "description": "Request for the source code of a given component. Will be responded with a `source` message.",
+        "type": "object",
         "properties": {
           "name": {
             "type": "string",
@@ -538,25 +585,32 @@
         }
       },
       "source": {
+        "title": "Source code",
         "description": "Source code for a component. In cases where a runtime receives a `source` message, it should do whatever operations are needed for making that component available for graphs, including possible compilation.",
+        "type": "object",
         "properties": {
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "Name of the component"
           },
           "language": {
+            "title": "Language",
             "type": "string",
             "description": "The programming language used for the component code, for example `coffeescript`"
           },
           "library": {
+            "title": "Library",
             "type": "string",
             "description": "(optional) Component library identifier"
           },
           "code": {
+            "title": "Code",
             "type": "string",
             "description": "Component source code"
           },
           "tests": {
+            "title": "Tests",
             "type": "string",
             "description": "(optional) unit tests for the component"
           }
@@ -569,19 +623,27 @@
     "description": "When a client connects to a FBP procotol it may choose to discover the capabilities and other information about the runtime.",
     "input": {
       "error": {
-        "description": "Runtime error"
+        "title": "Error",
+        "description": "Runtime error",
+        "type": "object"
       },
       "getruntime": {
-        "description": "Request the information about the runtime. When receiving this message the runtime should response with a runtime message."
+        "title": "Get runtime",
+        "description": "Request the information about the runtime. When receiving this message the runtime should response with a runtime message.",
+        "type": "object"
       },
       "packet": {
+        "title": "Packet",
         "description": "Runtimes that can be used as remote subgraphs (i.e. ones that have reported supporting the protocol:runtime capability) need to be able to receive and transmit information packets at their exposed ports.\nThese packets can be send from the client to the runtime's input ports, or from runtime's output ports to the client.",
+        "type": "object",
         "properties": {
           "port": {
+            "title": "Port",
             "type": "string",
             "description": "port name for the input or output port"
           },
           "event": {
+            "title": "Event",
             "type": "string",
             "enum": [
               "connect",
@@ -593,10 +655,12 @@
             "description": "packet event"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           },
           "payload": {
+            "title": "Payload",
             "type": "object",
             "description": "(optional) payload for the packet. Used only with begingroup (for group names) and data packets"
           }
@@ -605,87 +669,111 @@
     },
     "output": {
       "error": {
-        "description": "Runtime error"
+        "title": "Error",
+        "description": "Runtime error",
+        "type": "object"
       },
       "ports": {
+        "title": "Ports",
         "description": "Message sent by the runtime to signal its available ports. The runtime is responsible for sending the up-to-date list of available ports back to client whenever it changes.",
+        "type": "object",
         "properties": {
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "ID of the currently configured main graph running on the runtime"
           },
           "inPorts": {
+            "title": "Input ports",
             "description": "list of input ports",
-            "properties": {
-              "addressable": {
-                "type": "boolean",
-                "description": "boolean telling whether the port is an ArrayPort"
-              },
-              "id": {
-                "type": "string",
-                "description": "port name"
-              },
-              "type": {
-                "description": "port datatype, for example boolean",
-                "type": "string"
-              },
-              "required": {
-                "description": "boolean telling whether the port needs to be connected for the component to work",
-                "type": "boolean"
-              },
-              "description": {
-                "type": "string",
-                "description": "textual description of the port"
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "addressable": {
+                  "title": "addressable",
+                  "type": "boolean",
+                  "description": "boolean telling whether the port is an ArrayPort"
+                },
+                "id": {
+                  "title": "ID",
+                  "type": "string",
+                  "description": "port name"
+                },
+                "type": {
+                  "title": "Type",
+                  "description": "port datatype, for example boolean",
+                  "type": "string"
+                },
+                "required": {
+                  "title": "Required",
+                  "description": "boolean telling whether the port needs to be connected for the component to work",
+                  "type": "boolean"
+                },
+                "description": {
+                  "title": "Description",
+                  "type": "string",
+                  "description": "textual description of the port"
+                }
               }
-            },
-            "type": "array"
+            }
           },
           "outPorts": {
-            "type": "array",
+            "title": "Output ports",
             "description": "list of output ports",
-            "properties": {
-              "description": {
-                "type": "string",
-                "description": "textual description of the port"
-              },
-              "required": {
-                "type": "boolean",
-                "description": "boolean telling whether the port needs to be connected for the component to work"
-              },
-              "type": {
-                "description": "port datatype, for example boolean",
-                "type": "string"
-              },
-              "id": {
-                "description": "port name",
-                "type": "string"
-              },
-              "addressable": {
-                "description": "boolean telling whether the port is an ArrayPort",
-                "type": "boolean"
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "description": "textual description of the port"
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "boolean telling whether the port needs to be connected for the component to work"
+                },
+                "type": {
+                  "description": "port datatype, for example boolean",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "port name",
+                  "type": "string"
+                },
+                "addressable": {
+                  "description": "boolean telling whether the port is an ArrayPort",
+                  "type": "boolean"
+                }
               }
             }
           }
         }
       },
       "runtime": {
+        "title": "Runtime",
         "description": "Response from the runtime to the getruntime request.",
+        "type": "object",
         "properties": {
           "id": {
-            "required": false,
+            "title": "ID",
             "type": "string",
+            "required": false,
             "description": "(optional) runtime ID used with Flowhub Registry"
           },
           "label": {
+            "title": "Label",
             "description": "(optional) Human-readable description of the runtime",
             "type": "string",
             "required": false
           },
           "version": {
+            "title": "Version",
             "description": "version of the runtime protocol that the runtime supports, for example 0.4",
             "type": "string"
           },
           "capabilities": {
+            "title": "Capabilities",
             "type": "array",
             "items": {
               "protocol:network": {
@@ -713,14 +801,15 @@
             "description": "array of capability strings for things the runtime is able to do\nIf the runtime is currently running a graph and it is able to speak the full Runtime protocol, it should follow up with a ports message."
           },
           "graph": {
+            "title": "Graph",
             "description": "(optional) ID of the currently configured main graph running on the runtime, if any",
             "type": "string",
             "required": false
           },
           "type": {
+            "title": "Type",
             "description": "type of the runtime, for example noflo-nodejs or microflo",
-            "type": "string",
-            "title": "Type"
+            "type": "string"
           }
         }
       }
@@ -731,26 +820,32 @@
     "description": "This protocol is utilized for communicating about graph changes in both directions.",
     "output": {
       "error": {
-        "description": "Graph error"
+        "description": "Graph error",
+        "type": "object"
       },
       "addnode": {
         "description": "Add node to a graph.",
+        "type": "object",
         "properties": {
           "id": {
+            "title": "ID",
             "type": "string",
             "description": "identifier for the node",
             "required": true
           },
           "component": {
+            "title": "Component",
             "type": "string",
             "description": "component name used for the node",
             "required": true
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for node metadata"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
@@ -759,13 +854,16 @@
       },
       "removenode": {
         "description": "Remove a node from a graph.",
+        "type": "object",
         "properties": {
           "id": {
+            "title": "ID",
             "type": "string",
             "description": "identifier for the node",
             "required": true
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
@@ -774,18 +872,22 @@
       },
       "renamenode": {
         "description": "Change the ID of a node in the graph",
+        "type": "object",
         "properties": {
           "from": {
+            "title": "From",
             "type": "string",
             "description": "original identifier for the node",
             "required": true
           },
           "to": {
+            "title": "To",
             "type": "string",
             "description": "new identifier for the node",
             "required": true
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
@@ -793,19 +895,24 @@
         }
       },
       "changenode": {
+        "title": "Change node",
         "description": "Change the metadata associated to a node in the graph",
+        "type": "object",
         "properties": {
           "id": {
+            "title": "ID",
             "type": "string",
             "description": "identifier for the node",
             "required": true
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "structure of key-value pairs for node metadata",
             "required": true
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
@@ -814,23 +921,28 @@
       },
       "addedge": {
         "description": "Add an edge to the graph",
+        "type": "object",
         "properties": {
           "src": {
+            "title": "Source",
             "type": "object",
             "description": "source node for the edge",
             "required": true,
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier",
                 "required": true
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name",
                 "required": true
               },
               "index": {
+                "title": "Index",
                 "type": [
                   "string",
                   "number"
@@ -840,67 +952,85 @@
             }
           },
           "tgt": {
+            "title": "Target",
             "type": "object",
             "description": "target node for the edge",
             "required": true,
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier",
                 "required": true
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name",
                 "required": true
               },
               "index": {
+                "title": "Index",
                 "type": "string",
                 "description": "connection index (optional, for addressable ports)"
               }
             }
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for edge metadata"
           },
           "graph": {
+            "title": "Graph",
+            "type": "string",
             "description": "graph the action targets",
             "required": true
           }
         }
       },
       "removeedge": {
+        "title": "Remove edge",
         "description": "Remove an edge from the graph",
+        "type": "object",
         "properties": {
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
           },
           "src": {
+            "title": "Source",
+            "type": "object",
             "description": "source node for the edge",
             "required": true,
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
             }
           },
           "tgt": {
+            "title": "Target",
+            "type": "object",
             "description": "target node for the edge",
             "required": true,
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
@@ -909,40 +1039,50 @@
         }
       },
       "changeedge": {
+        "title": "Change edge",
         "description": "Change an edge's metadata",
+        "type": "object",
         "properties": {
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "struct of key-value pairs for edge metadata"
           },
           "src": {
+            "title": "Source",
             "type": "object",
             "description": "source node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
             }
           },
           "tgt": {
+            "title": "Target",
             "type": "object",
             "description": "target node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
@@ -951,38 +1091,48 @@
         }
       },
       "addinitial": {
+        "title": "Add initial",
         "description": "Add an IIP to the graph",
+        "type": "object",
         "properties": {
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for edge metadata"
           },
           "src": {
+            "title": "Source",
             "type": "object",
             "properties": {
               "data": {
+                "title": "Data",
                 "type": "any",
                 "description": "IIP value in its actual data type"
               }
             }
           },
           "tgt": {
+            "title": "Target",
             "type": "object",
             "description": "target node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               },
               "index": {
+                "title": "Index",
                 "type": [
                   "string",
                   "number"
@@ -994,16 +1144,21 @@
         }
       },
       "removeinitial": {
+        "title": "Remove initial",
         "description": "Remove an IIP from the graph",
+        "type": "object",
         "properties": {
           "tgt": {
+            "title": "Target",
             "type": "object",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
@@ -1011,185 +1166,238 @@
             "description": "target node for the edge"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "addinport": {
+        "title": "Add inport",
         "description": "Add an exported inport to the graph.",
+        "type": "object",
         "properties": {
           "public": {
+            "title": "Public",
             "type": "string",
             "description": "the exported name of the port"
           },
           "node": {
+            "title": "Node",
             "type": "string",
             "description": "node identifier"
           },
           "port": {
+            "title": "Port",
             "type": "string",
             "description": "internal port name"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for node metadata"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "removeinport": {
+        "title": "Remove inport",
         "description": "Remove an exported port from the graph",
+        "type": "object",
         "properties": {
           "public": {
+            "title": "Public",
             "type": "string",
             "description": "the exported name of the port to remove"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "renameinport": {
+        "title": "Rename inport",
         "description": "Rename an exported port in the graph",
+        "type": "object",
         "properties": {
           "from": {
+            "title": "From",
             "type": "string",
             "description": "original exported port name"
           },
           "to": {
+            "title": "To",
             "type": "string",
             "description": "new exported port name"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "addoutport": {
+        "title": "Add outport",
         "description": "Add an exported outport to the graph.",
+        "type": "object",
         "properties": {
           "public": {
+            "title": "Public",
             "type": "string",
             "description": "the exported name of the port"
           },
           "node": {
+            "title": "Node",
             "type": "string",
             "description": "node identifier"
           },
           "port": {
+            "title": "Port",
             "type": "string",
             "description": "internal port name"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for port metadata"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "removeoutport": {
+        "title": "Remove outport",
         "description": "Remove an exported port from the graph",
+        "type": "object",
         "properties": {
           "public": {
+            "title": "Public",
             "type": "string",
             "description": "the exported name of the port to remove"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "renameoutport": {
+        "title": "Rename outport",
         "description": "Rename an exported port in the graph",
+        "type": "object",
         "properties": {
           "from": {
+            "title": "From",
             "type": "string",
             "description": "original exported port name"
           },
           "to": {
+            "title": "To",
             "type": "string",
             "description": "new exported port name"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "addgroup": {
+        "title": "Add group",
         "description": "Add a group to the graph",
+        "type": "object",
         "properties": {
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "the group name"
           },
           "nodes": {
+            "title": "Nodes",
             "type": "array",
             "description": "an array of node ids part of the group"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for group metadata"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "removegroup": {
+        "title": "Remove group",
         "description": "Remove a group from the graph",
+        "type": "object",
         "properties": {
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "the group name"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "renamegroup": {
+        "title": "Rename group",
         "description": "Rename a group in the graph.",
+        "type": "object",
         "properties": {
           "from": {
+            "title": "From",
             "type": "string",
             "description": "original group name"
           },
           "to": {
+            "title": "To",
             "type": "string",
             "description": "new group name"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "changegroup": {
+        "title": "Change group",
         "description": "Change a group's metadata",
+        "type": "object",
         "properties": {
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "the group name",
             "required": true
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "structure of key-value pairs for group metadata"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
@@ -1199,34 +1407,45 @@
     },
     "input": {
       "error": {
-        "description": "Graph error"
+        "title": "Error",
+        "description": "Graph error",
+        "type": "object"
       },
       "clear": {
+        "title": "Clear",
         "description": "Initialize an empty graph.",
+        "type": "object",
         "properties": {
           "id": {
+            "title": "ID",
             "type": "string",
             "description": "identifier for the graph being created. Used for all subsequent messages related to the graph instance",
             "required": true
           },
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "(optional) Human-readable label for the graph"
           },
           "library": {
+            "title": "Library",
             "type": "string",
             "description": "(optional) Component library identifier"
           },
           "main": {
+            "title": "Main",
             "type": "boolean",
             "description": "(optional) Identifies the graph as a main graph of a project that should not be registered as a component\nGraphs registered in this way should also be available for use as subgraphs in other graphs. Therefore a graph registration and later changes to it may cause component messages of the Component protocol to be sent back to the client informing of possible changes in the ports of the subgraph component."
           }
         }
       },
       "subscribe": {
+        "title": "Subscribe",
         "description": "Subscribe to a graph.",
+        "type": "object",
         "properties": {
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph to subscribe to",
             "required": true
@@ -1234,9 +1453,12 @@
         }
       },
       "unsubscribe": {
+        "title": "Unsubscribe",
         "description": "Unsubscribe to a graph.",
+        "type": "object",
         "properties": {
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph to unsubscribe from",
             "required": true
@@ -1244,23 +1466,29 @@
         }
       },
       "addnode": {
+        "title": "Add node",
         "description": "Add node to a graph.",
+        "type": "object",
         "properties": {
           "id": {
+            "title": "ID",
             "type": "string",
             "description": "identifier for the node",
             "required": true
           },
           "component": {
+            "title": "Component",
             "type": "string",
             "description": "component name used for the node",
             "required": true
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for node metadata"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
@@ -1268,14 +1496,18 @@
         }
       },
       "removenode": {
+        "title": "Removenode",
         "description": "Remove a node from a graph.",
+        "type": "object",
         "properties": {
           "id": {
+            "title": "ID",
             "type": "string",
             "description": "identifier for the node",
             "required": true
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
@@ -1283,19 +1515,24 @@
         }
       },
       "renamenode": {
+        "title": "Rename node",
         "description": "Change the ID of a node in the graph",
+        "type": "object",
         "properties": {
           "from": {
+            "title": "From",
             "type": "string",
             "description": "original identifier for the node",
             "required": true
           },
           "to": {
+            "title": "To",
             "type": "string",
             "description": "new identifier for the node",
             "required": true
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
@@ -1303,19 +1540,24 @@
         }
       },
       "changenode": {
+        "title": "Change node",
         "description": "Change the metadata associated to a node in the graph",
+        "type": "object",
         "properties": {
           "id": {
+            "title": "ID",
             "type": "string",
             "description": "identifier for the node",
             "required": true
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "structure of key-value pairs for node metadata",
             "required": true
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets",
             "required": true
@@ -1323,21 +1565,27 @@
         }
       },
       "addedge": {
+        "title": "Add edge",
         "description": "Add an edge to the graph",
+        "type": "object",
         "properties": {
           "src": {
+            "title": "Source",
             "type": "object",
             "description": "source node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               },
               "index": {
+                "title": "Index",
                 "type": [
                   "string",
                   "number"
@@ -1347,18 +1595,22 @@
             }
           },
           "tgt": {
+            "title": "Target",
             "type": "object",
             "description": "target node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               },
               "index": {
+                "title": "Index",
                 "type": [
                   "string",
                   "number"
@@ -1368,44 +1620,55 @@
             }
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for edge metadata"
           },
           "graph": {
+            "title": "Graph",
             "description": "graph the action targets"
           }
         }
       },
       "removeedge": {
+        "title": "Remove edge",
         "description": "Remove an edge from the graph",
+        "type": "object",
         "properties": {
           "graph": {
+            "titile": "Graph",
             "type": "string",
             "description": "graph the action targets"
           },
           "src": {
+            "titile": "Source",
             "type": "object",
             "description": "source node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
             }
           },
           "tgt": {
+            "title": "Target",
             "type": "object",
             "description": "target node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
@@ -1414,39 +1677,49 @@
         }
       },
       "changeedge": {
+        "title": "Change edge",
         "description": "Change an edge's metadata",
+        "type": "object",
         "properties": {
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "struct of key-value pairs for edge metadata"
           },
           "src": {
+            "title": "Source",
             "type": "object",
             "description": "source node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
             }
           },
           "tgt": {
+            "title": "Target",
             "type": "object",
             "description": "target node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
@@ -1455,38 +1728,48 @@
         }
       },
       "addinitial": {
+        "title": "Add initial",
         "description": "Add an IIP to the graph",
+        "type": "object",
         "properties": {
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for edge metadata"
           },
           "src": {
+            "title": "Source",
             "type": "object",
             "properties": {
               "data": {
+                "title": "Data",
                 "type": "any",
                 "description": "IIP value in its actual data type"
               }
             }
           },
           "tgt": {
+            "title": "Target",
             "type": "object",
             "description": "target node for the edge",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               },
               "index": {
+                "title": "Index",
                 "type": [
                   "string",
                   "number"
@@ -1498,16 +1781,21 @@
         }
       },
       "removeinitial": {
+        "title": "Remove initial",
         "description": "Remove an IIP from the graph",
+        "type": "object",
         "properties": {
           "tgt": {
+            "title": "Target",
             "type": "object",
             "properties": {
               "node": {
+                "title": "Node",
                 "type": "string",
                 "description": "node identifier"
               },
               "port": {
+                "title": "Port",
                 "type": "string",
                 "description": "port name"
               }
@@ -1515,133 +1803,171 @@
             "description": "target node for the edge"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "addinport": {
+        "title": "Add inport",
         "description": "Add an exported inport to the graph.",
+        "type": "object",
         "properties": {
           "public": {
+            "title": "Public",
             "type": "string",
             "description": "the exported name of the port"
           },
           "node": {
+            "title": "Node",
             "type": "string",
             "description": "node identifier"
           },
           "port": {
+            "title": "Port",
             "type": "string",
             "description": "internal port name"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for node metadata"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "removeinport": {
+        "title": "Remove inport",
         "description": "Remove an exported port from the graph",
+        "type": "object",
         "properties": {
           "public": {
+            "title": "Public",
             "type": "string",
             "description": "the exported name of the port to remove"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "renameinport": {
+        "title": "Rename inport",
         "description": "Rename an exported port in the graph",
+        "type": "object",
         "properties": {
           "from": {
+            "title": "Rename inport",
             "type": "string",
             "description": "original exported port name"
           },
           "to": {
+            "title": "To",
             "type": "string",
             "description": "new exported port name"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "addoutport": {
+        "title": "Add outport",
         "description": "Add an exported outport to the graph.",
+        "type": "object",
         "properties": {
           "public": {
+            "title": "Public",
             "type": "string",
             "description": "the exported name of the port"
           },
           "node": {
+            "title": "Node",
             "type": "string",
             "description": "node identifier"
           },
           "port": {
+            "title": "Port",
             "type": "string",
             "description": "internal port name"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for port metadata"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "removeoutport": {
+        "title": "Remove outport",
         "description": "Remove an exported port from the graph",
+        "type": "object",
         "properties": {
           "public": {
+            "title": "Public",
             "type": "string",
             "description": "the exported name of the port to remove"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "renameoutport": {
+        "title": "Rename outport",
         "description": "Rename an exported port in the graph",
+        "type": "object",
         "properties": {
           "from": {
+            "title": "From",
             "type": "string",
             "description": "original exported port name"
           },
           "to": {
+            "title": "To",
             "type": "string",
             "description": "new exported port name"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "addgroup": {
+        "title": "Add group",
         "description": "Add a group to the graph",
+        "type": "object",
         "properties": {
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "the group name"
           },
           "nodes": {
+            "title": "Nodes",
             "type": "array",
             "description": "an array of node ids part of the group"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "(optional): structure of key-value pairs for group metadata"
           },
@@ -1652,47 +1978,61 @@
         }
       },
       "removegroup": {
+        "title": "Remove group",
         "description": "Remove a group from the graph",
+        "type": "object",
         "properties": {
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "the group name"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "renamegroup": {
+        "title": "Rename group",
         "description": "Rename a group in the graph.",
+        "type": "object",
         "properties": {
           "from": {
+            "title": "From",
             "type": "string",
             "description": "original group name"
           },
           "to": {
+            "title": "To",
             "type": "string",
             "description": "new group name"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
         }
       },
       "changegroup": {
+        "title": "Change group",
         "description": "Change a group's metadata",
+        "type": "object",
         "properties": {
           "name": {
+            "title": "Name",
             "type": "string",
             "description": "the group name"
           },
           "metadata": {
+            "title": "Metadata",
             "type": "object",
             "description": "structure of key-value pairs for group metadata"
           },
           "graph": {
+            "title": "Graph",
             "type": "string",
             "description": "graph the action targets"
           }
