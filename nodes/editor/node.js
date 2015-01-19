@@ -22,7 +22,7 @@ on.input.schema = function() {
     state.jsonEditor.setValue(state.in);
   }
   state.jsonEditor.on('change', state.changeHandler);
-  output({editor: stateEditor});
+  output({editor: state.jsonEditor});
 };
 
 on.input.enable = function() {

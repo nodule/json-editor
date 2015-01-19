@@ -6,12 +6,15 @@ id: MyProtocol
 Log(console/log)
 ProtocolEl(dom/querySelector), CommandEl(dom/querySelector)
 EditorEl(dom/querySelector)
+ButtonEl(dom/querySelector)
 
 SelectProtocol(bootstrap/select), SelectCommand(bootstrap/select)
 ClearCommands(dom/setHtml)
 ClearEditor(dom/setHtml)
 
 CommandEditor(json-editor/editor)
+Validate(json-editor/validate)
+Button(bootstrap/button)
 
 # TODO: relative paths should always work.
 provider ./graph/{ns}/{name}.fbp as x
@@ -22,6 +25,7 @@ GraphCommands(x:models/model)
 '#protocol' -> @selector ProtocolEl selection -> element SelectProtocol
 '#command'  -> @selector CommandEl selection -> ^element SelectCommand
 '#editor'   -> @selector EditorEl selection -> ^element CommandEditor
+'#button'   -> @selector ButtonEl selection -> ^element Button
 
 'Protocol' -> @label SelectProtocol
 'Command'  -> @label SelectCommand
@@ -46,6 +50,14 @@ SelectProtocol out -> in GraphCommands
 SelectProtocol out [clear] -> :start ClearCommands
 SelectProtocol out -> :start ClearEditor
 GraphCommands options     -> options SelectCommand
+
+CommandEditor out - > in Button
+
+# log to console.
+Button out -> msg Log
+Button out -> in Validate
+Validate errors -> msg Log
+Validate out -> msg Log
 
 SelectCommand out -> command GraphCommands
 GraphCommands schema -> schema CommandEditor
