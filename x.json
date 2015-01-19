@@ -7,7 +7,8 @@
     "url": "https://github.com/nodule/data.git"
   },
   "dependencies": {
-    "json-editor": "^0.7.13"
+    "json-editor": "git://github.com/psichi/json-editor",
+    "select2": "^3.5.1-browserify-fix"
   },
   "nodes": [
     {
@@ -131,6 +132,10 @@
           "out": {
             "title": "out",
             "type": "string"
+          },
+          "editor": {
+            "title": "Editor",
+            "type": "JSONEditor"
           }
         }
       },
@@ -147,7 +152,62 @@
       "title": "JSON Editor",
       "ns": "json-editor",
       "name": "editor",
-      "fn": "on.input.in = function() {\n  state.in = data;\n  if (state.jsonEditor) {\n    state.jsonEditor.setValue(state.in);\n  }\n};\n\non.input.schema = function() {\n  state.schema = input.options.schema = input.schema;\n  if (state.jsonEditor) {\n    state.jsonEditor.destroy();\n  }\n  state.jsonEditor = new json_editor(input.element, input.options);\n  // problem if state.in is not about this schema..\n  if (state.in) {\n    state.jsonEditor.setValue(state.in);\n  }\n  state.jsonEditor.on('change', function() {\n    output({out: state.jsonEditor.getValue()});\n  });\n};\n\non.input.enable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.enable();\n  }\n};\n\non.input.disable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.disable();\n  }\n};\n"
+      "fn": "state.jsonEditor = null;\nstate.changeHandler = function() {\n    output({out: state.jsonEditor.getValue()});\n};\n\non.input.in = function() {\n  state.in = data;\n  if (state.jsonEditor) {\n    state.jsonEditor.setValue(state.in);\n  }\n};\n\non.input.schema = function() {\n  state.schema = input.options.schema = input.schema;\n  if (state.jsonEditor) {\n    state.jsonEditor.off('change', state.changeHandler);\n    state.jsonEditor.destroy();\n  }\n  state.jsonEditor = new json_editor(input.element, input.options);\n  // problem if state.in is not about this schema..\n  if (state.in) {\n    state.jsonEditor.setValue(state.in);\n  }\n  state.jsonEditor.on('change', state.changeHandler);\n  output({editor: stateEditor});\n};\n\non.input.enable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.enable();\n  }\n};\n\non.input.disable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.disable();\n  }\n};\n"
+    },
+    {
+      "ports": {
+        "input": {
+          "in": {
+            "title": "Json",
+            "type": "object",
+            "description": "JSON Object",
+            "async": true
+          },
+          "editor": {
+            "title": "Editor",
+            "type": "JSONEditor",
+            "description": "JSONEditor instance"
+          }
+        },
+        "output": {
+          "out": {
+            "title": "Output",
+            "type": "string"
+          },
+          "errors": {
+            "title": "Errors",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "title": "Path",
+                  "description": "a dot separated path into the JSON object (e.g. `root.path.to.field`)",
+                  "type": "string"
+                },
+                "property": {
+                  "title": "Property",
+                  "description": "schema keyword that triggered the validation error (e.g. `minLength`)",
+                  "type": "string"
+                },
+                "message": {
+                  "title": "Message",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "phrases": {
+        "active": "Validating form"
+      },
+      "async": true,
+      "description": "JSON Editor Validate",
+      "title": "JSON Editor Validate",
+      "ns": "json-editor",
+      "name": "validate",
+      "fn": "on.input.in = function() {\n  var errors = input.editor.validate(data);\n  if(errors.length) {\n    output({errors: errors});\n  } else {\n    output({out: data});\n  }\n};\n"
     }
   ],
   "twigs": []

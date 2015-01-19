@@ -1,3 +1,8 @@
+state.jsonEditor = null;
+state.changeHandler = function() {
+    output({out: state.jsonEditor.getValue()});
+};
+
 on.input.in = function() {
   state.in = data;
   if (state.jsonEditor) {
@@ -8,6 +13,7 @@ on.input.in = function() {
 on.input.schema = function() {
   state.schema = input.options.schema = input.schema;
   if (state.jsonEditor) {
+    state.jsonEditor.off('change', state.changeHandler);
     state.jsonEditor.destroy();
   }
   state.jsonEditor = new json_editor(input.element, input.options);
@@ -15,9 +21,8 @@ on.input.schema = function() {
   if (state.in) {
     state.jsonEditor.setValue(state.in);
   }
-  state.jsonEditor.on('change', function() {
-    output({out: state.jsonEditor.getValue()});
-  });
+  state.jsonEditor.on('change', state.changeHandler);
+  output({editor: stateEditor});
 };
 
 on.input.enable = function() {

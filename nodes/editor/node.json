@@ -132,6 +132,10 @@
       "out": {
         "title": "out",
         "type": "string"
+      },
+      "editor": {
+        "title": "Editor",
+        "type": "JSONEditor"
       }
     }
   }

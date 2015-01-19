@@ -22,7 +22,9 @@ GraphCommands(x:models/model)
 '#protocol' -> @selector ProtocolEl selection -> element SelectProtocol
 '#command'  -> @selector CommandEl selection -> ^element SelectCommand
 '#editor'   -> @selector EditorEl selection -> ^element CommandEditor
-'Protocol'  -> @label SelectProtocol
+
+'Protocol' -> @label SelectProtocol
+'Command'  -> @label SelectCommand
 
 "./defaults.json!" ~> @options CommandEditor
 
