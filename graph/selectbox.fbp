@@ -25,7 +25,7 @@ GraphCommands(x:models/model)
 '#protocol' -> @selector ProtocolEl selection -> element SelectProtocol
 '#command'  -> @selector CommandEl selection -> ^element SelectCommand
 '#editor'   -> @selector EditorEl selection -> ^element CommandEditor
-'#button'   -> @selector ButtonEl selection -> ^element Button
+'#button'   -> @selector ButtonEl selection -> element Button
 
 'Protocol' -> @label SelectProtocol
 'Command'  -> @label SelectCommand
@@ -51,7 +51,10 @@ SelectProtocol out [clear] -> :start ClearCommands
 SelectProtocol out -> :start ClearEditor
 GraphCommands options     -> options SelectCommand
 
-CommandEditor out - > in Button
+CommandEditor out -> in Button
+
+# weird, it continues if editor is not set, it should never reach the portbox..
+CommandEditor editor -> editor Validate
 
 # log to console.
 Button out -> msg Log

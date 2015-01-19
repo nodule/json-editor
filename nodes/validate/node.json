@@ -17,7 +17,7 @@
       },
       "editor": {
         "title": "Editor",
-        "type": "JSONEditor",
+        "type": "function",
         "description": "JSONEditor instance"
       }
     },
