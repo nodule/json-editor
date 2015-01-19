@@ -18,11 +18,13 @@ on.input.schema = function() {
   }
   state.jsonEditor = new json_editor(input.element, input.options);
   // problem if state.in is not about this schema..
-  if (state.in) {
-    state.jsonEditor.setValue(state.in);
-  }
-  state.jsonEditor.on('change', state.changeHandler);
-  output({editor: state.jsonEditor});
+  state.jsonEditor.on('ready', function() {
+    if (state.in) {
+      state.jsonEditor.setValue(state.in);
+    }
+    state.jsonEditor.on('change', state.changeHandler);
+    output({editor: state.jsonEditor});
+  });
 };
 
 on.input.enable = function() {

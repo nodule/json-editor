@@ -34,6 +34,7 @@ GraphCommands(x:models/model)
 
 '' -> @html ClearCommands
 '' -> @html ClearEditor
+'Save' -> @label Button
 
 CommandEl selection -> ^element ClearCommands
 EditorEl selection -> ^element ClearEditor
