@@ -18,6 +18,12 @@
         overflow-y: scroll;
       }
 
+      .message {
+        width: 150px;
+        float: left;
+        margin: 1em;
+      }
+
     </style>
   </head>
   <body>
@@ -36,13 +42,13 @@
             <div class="panel-body">
               <div id="editor"></div>
               <div class="button-group">
-                <div id="button"></div>
+                <span id="clear"></span><span id="button" class="pull-right"></span>
               </div>
             </div>
           </div>
         </div>
         <div class="col-md-8">
-
+           <div id="messages"></div>
         </div>
       </div>
   </body>
