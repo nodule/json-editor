@@ -190,7 +190,7 @@
       },
       "dependencies": {
         "npm": {
-          "json-editor": "latest"
+          "json-editor": "psichi/json-editor"
         }
       },
       "phrases": {
