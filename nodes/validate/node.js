@@ -1,8 +1,8 @@
 on.input.in = function() {
   var errors = $.editor.validate($.in);
   if(errors.length) {
-    output({errors: errors});
+    output({errors: $.create(errors)});
   } else {
-    output({out: $.in});
+    output({out: $.get('in')});
   }
 };

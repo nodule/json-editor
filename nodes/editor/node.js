@@ -1,6 +1,6 @@
 state.jsonEditor = null;
 state.changeHandler = function() {
-    output({out: state.jsonEditor.getValue()});
+    output({out: $.clone('in', state.jsonEditor.getValue())});
 };
 
 on.input.in = function() {
@@ -23,7 +23,7 @@ on.input.schema = function() {
       state.jsonEditor.setValue(state.in);
     }
     state.jsonEditor.on('change', state.changeHandler);
-    output({editor: state.jsonEditor});
+    output({editor: $.create(state.jsonEditor)});
   });
 };
 
