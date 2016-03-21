@@ -4,19 +4,19 @@ state.changeHandler = function() {
 };
 
 on.input.in = function() {
-  state.in = input.in;
+  state.in = $.in;
   if (state.jsonEditor) {
     state.jsonEditor.setValue(state.in);
   }
 };
 
 on.input.schema = function() {
-  state.schema = input.options.schema = input.schema;
+  state.schema = $.options.schema = $.schema;
   if (state.jsonEditor) {
     state.jsonEditor.off('change', state.changeHandler);
     state.jsonEditor.destroy();
   }
-  state.jsonEditor = new json_editor(input.element, input.options);
+  state.jsonEditor = new json_editor($.element, $.options);
   // problem if state.in is not about this schema..
   state.jsonEditor.on('ready', function() {
     if (state.in) {
