@@ -1,8 +1,8 @@
 on.input.in = function() {
-  var errors = input.editor.validate(data);
+  var errors = input.editor.validate(input.in);
   if(errors.length) {
     output({errors: errors});
   } else {
-    output({out: data});
+    output({out: input.in});
   }
 };

@@ -4,7 +4,7 @@ state.changeHandler = function() {
 };
 
 on.input.in = function() {
-  state.in = data;
+  state.in = input.in;
   if (state.jsonEditor) {
     state.jsonEditor.setValue(state.in);
   }
