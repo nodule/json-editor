@@ -14,7 +14,7 @@ module.exports = {
         type: "object",
         description: "JSON Object",
         async: true,
-        fn: function __IN__(data, x, source, state, input, output) {
+        fn: function __IN__(data, source, state, input, $, output) {
           var r = function() {
             var errors = $.editor.validate($.in);
             if (errors.length) {

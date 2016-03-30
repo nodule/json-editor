@@ -24,7 +24,7 @@ module.exports = {
         type: "object",
         description: "JSON Object",
         async: true,
-        fn: function __IN__(data, x, source, state, input, output, json_editor) {
+        fn: function __IN__(data, source, state, input, $, output, json_editor) {
           var r = function() {
             state.in = $.in;
             if (state.jsonEditor) {
@@ -42,7 +42,7 @@ module.exports = {
         type: "object",
         description: "A valid JSON Schema to use for the editor. Version 3 and Version 4 of the draft specification are supported.",
         async: true,
-        fn: function __SCHEMA__(data, x, source, state, input, output, json_editor) {
+        fn: function __SCHEMA__(data, source, state, input, $, output, json_editor) {
           var r = function() {
             state.schema = $.options.schema = $.schema;
             if (state.jsonEditor) {
@@ -71,7 +71,7 @@ module.exports = {
         title: "Enable",
         description: "Enable",
         async: true,
-        fn: function __ENABLE__(data, x, source, state, input, output, json_editor) {
+        fn: function __ENABLE__(data, source, state, input, $, output, json_editor) {
           var r = function() {
             if (state.jsonEditor) {
               state.jsonEditor.enable();
@@ -87,7 +87,7 @@ module.exports = {
         title: "Disable",
         description: "Disable",
         async: true,
-        fn: function __DISABLE__(data, x, source, state, input, output, json_editor) {
+        fn: function __DISABLE__(data, source, state, input, $, output, json_editor) {
           var r = function() {
             if (state.jsonEditor) {
               state.jsonEditor.disable();
