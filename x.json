@@ -12,6 +12,19 @@
   },
   "nodes": [
     {
+      "name": "editor",
+      "ns": "json-editor",
+      "title": "JSON Editor",
+      "description": "JSON Editor",
+      "async": true,
+      "phrases": {
+        "active": "Creating JSON Editor"
+      },
+      "dependencies": {
+        "npm": {
+          "json-editor": "psichi/json-editor"
+        }
+      },
       "ports": {
         "input": {
           "element": {
@@ -188,22 +201,17 @@
           }
         }
       },
-      "dependencies": {
-        "npm": {
-          "json-editor": "psichi/json-editor"
-        }
-      },
-      "phrases": {
-        "active": "Creating JSON Editor"
-      },
-      "async": true,
-      "description": "JSON Editor",
-      "title": "JSON Editor",
-      "ns": "json-editor",
-      "name": "editor",
       "fn": "state.jsonEditor = null;\nstate.changeHandler = function() {\n    output({out: $.clone('in', state.jsonEditor.getValue())});\n};\n\non.input.in = function() {\n  state.in = $.in;\n  if (state.jsonEditor) {\n    state.jsonEditor.setValue(state.in);\n  }\n};\n\non.input.schema = function() {\n  state.schema = $.options.schema = $.schema;\n  if (state.jsonEditor) {\n    state.jsonEditor.off('change', state.changeHandler);\n    state.jsonEditor.destroy();\n  }\n  state.jsonEditor = new json_editor($.element, $.options);\n  // problem if state.in is not about this schema..\n  state.jsonEditor.on('ready', function() {\n    if (state.in) {\n      state.jsonEditor.setValue(state.in);\n    }\n    state.jsonEditor.on('change', state.changeHandler);\n    output({editor: $.create(state.jsonEditor)});\n  });\n};\n\non.input.enable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.enable();\n  }\n};\n\non.input.disable = function() {\n  if (state.jsonEditor) {\n    state.jsonEditor.disable();\n  }\n};\n"
     },
     {
+      "name": "validate",
+      "ns": "json-editor",
+      "title": "JSON Editor Validate",
+      "description": "JSON Editor Validate",
+      "async": true,
+      "phrases": {
+        "active": "Validating form"
+      },
       "ports": {
         "input": {
           "in": {
@@ -248,16 +256,7 @@
           }
         }
       },
-      "phrases": {
-        "active": "Validating form"
-      },
-      "async": true,
-      "description": "JSON Editor Validate",
-      "title": "JSON Editor Validate",
-      "ns": "json-editor",
-      "name": "validate",
       "fn": "on.input.in = function() {\n  var errors = $.editor.validate($.in);\n  if(errors.length) {\n    output({errors: $.create(errors)});\n  } else {\n    output({out: $.get('in')});\n  }\n};\n"
     }
-  ],
-  "twigs": []
+  ]
 }
